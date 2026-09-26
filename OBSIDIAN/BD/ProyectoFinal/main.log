@@ -1,0 +1,798 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.9.20)  25 SEP 2026 11:48
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**main.tex
+(./main.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+(/usr/share/texmf-dist/tex/latex/base/report.cls
+Document Class: report 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count275
+\c@chapter=\count276
+\c@section=\count277
+\c@subsection=\count278
+\c@subsubsection=\count279
+\c@paragraph=\count280
+\c@subparagraph=\count281
+\c@figure=\count282
+\c@table=\count283
+\abovecaptionskip=\skip49
+\belowcaptionskip=\skip50
+\bibindent=\dimen148
+)
+(/usr/share/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2024/02/08 v1.3d Input encoding file
+\inpenc@prehook=\toks17
+\inpenc@posthook=\toks18
+)
+(/usr/share/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
+)
+(/usr/share/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2026/02/14 v26.3 The multilingual framework for LuaLaTeX, pdfLaT
+eX and XeLaTeX
+\babel@savecnt=\count284
+LaTeX Encoding Info:    Redeclaring text command \ij (encoding OT1) on input li
+ne 2078.
+LaTeX Encoding Info:    Redeclaring text command \IJ (encoding OT1) on input li
+ne 2080.
+LaTeX Encoding Info:    Redeclaring text command \ij (encoding T1) on input lin
+e 2082.
+LaTeX Encoding Info:    Redeclaring text command \IJ (encoding T1) on input lin
+e 2083.
+LaTeX Encoding Info:    Ignoring declaration for text command \ij (encoding ?) 
+on input line 2084.
+LaTeX Encoding Info:    Ignoring declaration for text command \IJ (encoding ?) 
+on input line 2086.
+LaTeX Encoding Info:    Ignoring declaration for text command \SS (encoding ?) 
+on input line 2111.
+\U@D=\dimen149
+\l@unhyphenated=\language6
+
+(/usr/share/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@readstream=\read2
+\bbl@dirlevel=\count285
+
+(/usr/share/texmf-dist/tex/generic/babel/locale/es/babel-spanish.tex)
+Package babel Info: Importing font and identification data for spanish
+(babel)             from babel-es.ini. Reported on input line 4330.
+
+(/usr/share/texmf-dist/tex/generic/babel-spanish/spanish.ldf
+Language: spanish.ldf 2021/05/27 v5.0q Spanish support from the babel system
+\es@quottoks=\toks19
+\es@quotdepth=\count286
+Package babel Info: Making " an active character on input line 570.
+Package babel Info: Making . an active character on input line 675.
+Package babel Info: Making < an active character on input line 722.
+Package babel Info: Making > an active character on input line 722.
+))
+LaTeX Encoding Info:    Redeclaring text command \guillemotleft (encoding OT1) 
+on input line 6.
+LaTeX Encoding Info:    Redeclaring text command \guillemotright (encoding OT1)
+ on input line 6.
+
+(/usr/share/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks20
+)
+(/usr/share/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
+)
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 106.
+
+(/usr/share/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen150
+\Gin@req@width=\dimen151
+)
+(/usr/share/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+
+(/usr/share/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+
+(/usr/share/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2024/12/12 v1.0g TeX engine tests
+))
+\Gm@cnth=\count287
+\Gm@cntv=\count288
+\c@Gm@tempcnt=\count289
+\Gm@bindingoffset=\dimen152
+\Gm@wd@mp=\dimen153
+\Gm@odd@mp=\dimen154
+\Gm@even@mp=\dimen155
+\Gm@layoutwidth=\dimen156
+\Gm@layoutheight=\dimen157
+\Gm@layouthoffset=\dimen158
+\Gm@layoutvoffset=\dimen159
+\Gm@dimlist=\toks21
+)
+(/usr/share/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2026-01-29 v7.01p Hypertext links for LaTeX
+
+(/usr/share/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
+)
+(/usr/share/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+)
+(/usr/share/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+
+(/usr/share/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
+)
+(/usr/share/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/usr/share/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+))
+(/usr/share/texmf-dist/tex/latex/hycolor/hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+)
+(/usr/share/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2026-01-29 v2.58 Cross-referencing by name of section
+
+(/usr/share/texmf-dist/tex/latex/refcount/refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+)
+(/usr/share/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+
+(/usr/share/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+))
+\c@section@level=\count290
+)
+(/usr/share/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count291
+)
+(/usr/share/texmf-dist/tex/generic/stringenc/stringenc.sty
+Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
+)
+)
+\@linkdim=\dimen160
+\Hy@linkcounter=\count292
+\Hy@pagecounter=\count293
+
+(/usr/share/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2026-01-29 v7.01p Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+(/usr/share/texmf-dist/tex/generic/intcalc/intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+\Hy@SavedSpaceFactor=\count294
+
+(/usr/share/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2026-01-29 v7.01p Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Hyper figures OFF on input line 4201.
+Package hyperref Info: Link nesting OFF on input line 4206.
+Package hyperref Info: Hyper index ON on input line 4209.
+Package hyperref Info: Plain pages OFF on input line 4216.
+Package hyperref Info: Backreferencing OFF on input line 4221.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4468.
+\c@Hy@tempcnt=\count295
+
+(/usr/share/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 4807.
+\XeTeXLinkMargin=\dimen161
+
+(/usr/share/texmf-dist/tex/generic/bitset/bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+
+(/usr/share/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count296
+\Field@Width=\dimen162
+\Fld@charsize=\dimen163
+Package hyperref Info: Hyper figures OFF on input line 6084.
+Package hyperref Info: Link nesting OFF on input line 6089.
+Package hyperref Info: Hyper index ON on input line 6092.
+Package hyperref Info: backreferencing OFF on input line 6099.
+Package hyperref Info: Link coloring OFF on input line 6104.
+Package hyperref Info: Link coloring with OCG OFF on input line 6109.
+Package hyperref Info: PDF/A mode OFF on input line 6114.
+\Hy@abspage=\count297
+\c@Item=\count298
+\c@Hfootnote=\count299
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+
+(/usr/share/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2026-01-29 v7.01p Hyperref driver for pdfTeX
+\Fld@listcount=\count300
+\c@bookmark@seq@number=\count301
+
+(/usr/share/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
+
+(/usr/share/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+84.
+)
+\Hy@SectionHShift=\skip51
+)
+(/usr/share/texmf-dist/tex/latex/tools/tabularx.sty
+Package: tabularx 2023/12/11 v2.12a `tabularx' package (DPC)
+
+(/usr/share/texmf-dist/tex/latex/tools/array.sty
+Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
+\col@sep=\dimen164
+\ar@mcellbox=\box53
+\extrarowheight=\dimen165
+\NC@list=\toks22
+\extratabsurround=\skip52
+\backup@length=\skip53
+\ar@cellbox=\box54
+)
+\TX@col@width=\dimen166
+\TX@old@table=\dimen167
+\TX@old@col=\dimen168
+\TX@target=\dimen169
+\TX@delta=\dimen170
+\TX@cols=\count302
+\TX@ftn=\toks23
+)
+(/usr/share/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
+\multirow@colwidth=\skip54
+\multirow@cntb=\count303
+\multirow@dima=\skip55
+\bigstrutjot=\dimen171
+)
+(/usr/share/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen172
+\lightrulewidth=\dimen173
+\cmidrulewidth=\dimen174
+\belowrulesep=\dimen175
+\belowbottomsep=\dimen176
+\aboverulesep=\dimen177
+\abovetopsep=\dimen178
+\cmidrulesep=\dimen179
+\cmidrulekern=\dimen180
+\defaultaddspace=\dimen181
+\@cmidla=\count304
+\@cmidlb=\count305
+\@aboverulesep=\dimen182
+\@belowrulesep=\dimen183
+\@thisruleclass=\count306
+\@lastruleclass=\count307
+\@thisrulewidth=\dimen184
+)
+(/usr/share/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count308
+\float@exts=\toks24
+\float@box=\box55
+\@float@everytoks=\toks25
+\@floatcapt=\box56
+)
+(/usr/share/texmf-dist/tex/latex/titlesec/titlesec.sty
+Package: titlesec 2025/01/04 v2.17 Sectioning titles
+\ttl@box=\box57
+\beforetitleunit=\skip56
+\aftertitleunit=\skip57
+\ttl@plus=\dimen185
+\ttl@minus=\dimen186
+\ttl@toksa=\toks26
+\titlewidth=\dimen187
+\titlewidthlast=\dimen188
+\titlewidthfirst=\dimen189
+)
+(/usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count309
+) (./main.aux
+LaTeX Info: Redefining \. on input line 11.
+LaTeX Info: Redefining \% on input line 11.
+Package babel Info: 'spanish' activates 'spanish' shorthands.
+(babel)             Reported on input line 11.
+)
+\openout1 = `main.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Info: Redefining \. on input line 17.
+LaTeX Info: Redefining \% on input line 17.
+
+(/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count310
+\scratchdimen=\dimen190
+\scratchbox=\box58
+\nofMPsegments=\count311
+\nofMParguments=\count312
+\everyMPshowfont=\toks27
+\MPscratchCnt=\count313
+\MPscratchDim=\dimen191
+\MPnumerator=\count314
+\makeMPintoPDFobject=\count315
+\everyMPtoPDFconversion=\toks28
+) (/usr/share/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(71.13188pt, 455.24411pt, 71.13188pt)
+* v-part:(T,H,B)=(71.13188pt, 702.78308pt, 71.13188pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=455.24411pt
+* \textheight=702.78308pt
+* \oddsidemargin=-1.1381pt
+* \evensidemargin=-1.1381pt
+* \topmargin=-38.1381pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=35.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+Package hyperref Info: Link coloring OFF on input line 17.
+(./main.out) (./main.out)
+\@outlinefile=\write3
+\openout3 = `main.out'.
+
+ (./caratula.tex [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf-dist/fonts
+/enc/dvips/cm-super/cm-super-t1.enc}]) (./indice.tex (./main.toc
+LaTeX Info: Redefining \. on input line 1.
+LaTeX Info: Redefining \% on input line 1.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 3.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 3.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 3.
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
+been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.39 ...ne {3.2.1}Entidades}{20}{subsection.3.2.1}
+                                                  % [1
+
+])
+\tf@toc=\write4
+\openout4 = `main.toc'.
+
+ [2]) (./requisitos.tex
+Cap\'{\i }tulo 1.
+[3
+
+] [4] [5]
+Overfull \hbox (18.0706pt too wide) in paragraph at lines 70--71
+[]\T1/cmr/bx/n/12 Herencia de en-ti-da-des me-dian-te pa-trón JOI-NED: \T1/cmr/
+m/n/12 La je-rar-quía \T1/cmtt/m/n/12 Objeto_Espacial
+ []
+
+
+Overfull \hbox (19.42603pt too wide) in paragraph at lines 71--72
+\T1/cmr/m/n/12 bi-rá mi-llo-nes de re-gis-tros dia-rios. Se im-ple-men-ta-rán í
+n-di-ces B-Tree so-bre \T1/cmtt/m/n/12 (ID_Satelite,
+ []
+
+[6]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 104.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 104.
+ [7
+pdfTeX warning (ext4): destination with the same identifier (name{table.1.1}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.144 
+      ] [8
+pdfTeX warning (ext4): destination with the same identifier (name{table.1.2}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.181     \item E
+                 SA Space Debris Office. (s.f.). \textit{Space Debris by the...
+
+pdfTeX warning (ext4): destination with the same identifier (name{table.1.3}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.181     \item E
+                 SA Space Debris Office. (s.f.). \textit{Space Debris by the...
+] [9]) (./modelo_ER.tex [10]
+Cap\'{\i }tulo 2.
+[11
+
+]
+Overfull \hbox (0.99237pt too wide) in paragraph at lines 22--23
+\T1/cmr/m/n/12 (mi-sión que lo ge-ne-ró), \T1/cmtt/m/n/12 Tamaño_mts \T1/cmr/m/
+n/12 es-ti-ma-do, \T1/cmtt/m/n/12 Nivel_Riesgo \T1/cmr/m/n/12 y \T1/cmtt/m/n/12
+ Fuente_Radar \T1/cmr/m/n/12 (agen-
+ []
+
+
+Overfull \hbox (28.76265pt too wide) in paragraph at lines 46--47
+[]\T1/cmr/bx/n/12 Maniobra_Evasiva \T1/cmr/m/n/12 re-gis-tra la res-pues-ta ope
+-ra-ti-va eje-cu-ta-da an-te un \T1/cmtt/m/n/12 Evento_Colision\T1/cmr/m/n/12 .
+
+ []
+
+[12]
+<Diagrama.pdf, id=314, 2902.845pt x 2902.845pt>
+File: Diagrama.pdf Graphic file (type pdf)
+<use Diagrama.pdf>
+Package pdftex.def Info: Diagrama.pdf  used on input line 55.
+(pdftex.def)             Requested size: 455.20729pt x 455.20729pt.
+ [13] [14
+pdfTeX warning (ext4): destination with the same identifier (name{figure.2.1}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.68 \end{itemize}
+                   <./Diagrama.pdf>]
+Overfull \hbox (7.5955pt too wide) in paragraph at lines 73--74
+[]\T1/cmr/bx/n/12 Especificaciones: \T1/cmr/m/n/12 Al-ma-ce-na la agru-pa-ción 
+de sa-té-li-tes por mi-sión: \T1/cmtt/m/n/12 ID_Constelacion
+ []
+
+
+Overfull \hbox (47.48691pt too wide) in paragraph at lines 80--81
+\T1/cmtt/m/n/12 Nombre \T1/cmr/m/n/12 (NOT NULL), \T1/cmtt/m/n/12 Correo \T1/cm
+r/m/n/12 (UK, NOT NULL), \T1/cmtt/m/n/12 Rol \T1/cmr/m/n/12 (NOT NULL) y \T1/cm
+tt/m/n/12 Fecha_Contratacion\T1/cmr/m/n/12 . 
+ []
+
+
+Overfull \hbox (22.97507pt too wide) in paragraph at lines 87--88
+[]\T1/cmr/bx/n/12 Especificaciones: \T1/cmr/m/n/12 Su-per-cla-se abs-trac-ta de
+l ca-tá-lo-go or-bi-tal: \T1/cmtt/m/n/12 ID_Objeto \T1/cmr/m/n/12 (PK), \T1/cmt
+t/m/n/12 NORAD_ID
+ []
+
+
+Overfull \hbox (9.67067pt too wide) in paragraph at lines 87--88
+\T1/cmr/m/n/12 (UK), \T1/cmtt/m/n/12 Altitud_Actual_km\T1/cmr/m/n/12 , \T1/cmtt
+/m/n/12 Velocidad_km_s \T1/cmr/m/n/12 y \T1/cmtt/m/n/12 Tipo_Objeto \T1/cmr/m/n
+/12 (dis-cri-mi-na-dor CHECK:
+ []
+
+[15]
+Overfull \hbox (4.62268pt too wide) in paragraph at lines 108--109
+[]\T1/cmr/bx/n/12 Especificaciones: \T1/cmr/m/n/12 Ca-tá-lo-go de pa-rá-me-tros
+ or-bi-ta-les: \T1/cmtt/m/n/12 ID_Orbita \T1/cmr/m/n/12 (PK), \T1/cmtt/m/n/12 T
+ipo_Orbita
+ []
+
+
+Overfull \hbox (27.18097pt too wide) in paragraph at lines 115--116
+[]\T1/cmr/bx/n/12 Especificaciones: \T1/cmr/m/n/12 Re-gis-tra las ins-ta-la-cio
+-nes te-rres-tres: \T1/cmtt/m/n/12 ID_Estacion \T1/cmr/m/n/12 (PK), \T1/cmtt/m/
+n/12 ID_Operador
+ []
+
+
+Overfull \hbox (13.33331pt too wide) in paragraph at lines 115--116
+\T1/cmr/m/n/12 (FK, NOT NULL), \T1/cmtt/m/n/12 Nombre_Instalacion \T1/cmr/m/n/1
+2 (NOT NULL), \T1/cmtt/m/n/12 Pais \T1/cmr/m/n/12 (NOT NULL), \T1/cmtt/m/n/12 L
+atitud\T1/cmr/m/n/12 ,
+ []
+
+
+Overfull \hbox (22.2864pt too wide) in paragraph at lines 122--123
+[]\T1/cmr/bx/n/12 Especificaciones: \T1/cmr/m/n/12 Re-gis-tra ca-da ven-ta-na d
+e con-tac-to: \T1/cmtt/m/n/12 ID_Contacto \T1/cmr/m/n/12 (PK), \T1/cmtt/m/n/12 
+ID_Satelite
+ []
+
+[16]
+Overfull \hbox (38.64369pt too wide) in paragraph at lines 129--130
+\T1/cmr/m/n/12 PK), \T1/cmtt/m/n/12 ID_Satelite \T1/cmr/m/n/12 (FK, NOT NULL), 
+\T1/cmtt/m/n/12 Timestamp_Lectura \T1/cmr/m/n/12 (NOT NULL), \T1/cmtt/m/n/12 Te
+mperatura_C\T1/cmr/m/n/12 ,
+ []
+
+
+Overfull \hbox (26.39583pt too wide) in paragraph at lines 129--130
+\T1/cmtt/m/n/12 Bateria_Pct\T1/cmr/m/n/12 , \T1/cmtt/m/n/12 Voltaje_V\T1/cmr/m/
+n/12 , \T1/cmtt/m/n/12 Altitud_Real_km\T1/cmr/m/n/12 , \T1/cmtt/m/n/12 Posicion
+_Latitud \T1/cmr/m/n/12 y \T1/cmtt/m/n/12 Posicion_Longitud\T1/cmr/m/n/12 . 
+ []
+
+
+Overfull \hbox (3.28835pt too wide) in paragraph at lines 136--137
+\T1/cmr/m/n/12 (FK), \T1/cmtt/m/n/12 ID_Basura \T1/cmr/m/n/12 (FK), \T1/cmtt/m/
+n/12 Timestamp_Estimado \T1/cmr/m/n/12 (NOT NULL), \T1/cmtt/m/n/12 Probabilidad
+_Choque
+ []
+
+
+Overfull \hbox (49.20427pt too wide) in paragraph at lines 137--138
+[]\T1/cmr/bx/n/12 Consideraciones: \T1/cmr/m/n/12 Es-ta en-ti-dad re-suel-ve la
+ re-la-ción N:M en-tre \T1/cmtt/m/n/12 Satelite \T1/cmr/m/n/12 y \T1/cmtt/m/n/1
+2 Basura_Espacial\T1/cmr/m/n/12 :
+ []
+
+
+Overfull \hbox (3.11327pt too wide) in paragraph at lines 143--144
+\T1/cmr/m/n/12 (FK, UK), \T1/cmtt/m/n/12 ID_Operador \T1/cmr/m/n/12 (FK), \T1/c
+mtt/m/n/12 Tipo_Maniobra\T1/cmr/m/n/12 , \T1/cmtt/m/n/12 Delta_V_ms\T1/cmr/m/n/
+12 , \T1/cmtt/m/n/12 Timestamp_Ejecucion
+ []
+
+) (./modelo_relacional.tex [17]
+Cap\'{\i }tulo 3.
+
+Overfull \hbox (21.18289pt too wide) in paragraph at lines 7--8
+\T1/cmr/m/n/12 trón Ta-ble Per Sub-class (JOI-NED) pa-ra \T1/cmtt/m/n/12 Objeto
+_Espacial $\OMS/cmsy/m/n/12 !$ \T1/cmr/m/n/12 {\T1/cmtt/m/n/12 Satelite\T1/cmr/
+m/n/12 , \T1/cmtt/m/n/12 Basura_Espacial\T1/cmr/m/n/12 }.
+ []
+
+
+Overfull \hbox (17.88576pt too wide) in paragraph at lines 29--30
+[]\T1/cmr/m/n/12 Basura_Espacial ($[]$ (FK), Des-crip-cion_Origen, Ta-ma-ño_mts
+, Ni-vel_Riesgo,
+ []
+
+[18
+
+]
+Overfull \hbox (47.94966pt too wide) in paragraph at lines 56--57
+[]\T1/cmr/m/n/12 Contacto_Estacion: re-suel-ve Sa-te-li-te $\OMS/cmsy/m/n/12 $$
+ \T1/cmr/m/n/12 Es-ta-cion_Terrena (con atri-bu-tos Ca-li-dad_Senal_dB
+ []
+
+
+Overfull \hbox (38.40854pt too wide) in paragraph at lines 63--64
+\T1/cmr/m/n/12 ra_C, Ba-te-ria_Pct, Vol-ta-je_V, Al-ti-tud_Real_km, Po-si-cion_
+Latitud, Po-si-cion_Longitud) 
+ []
+
+
+Overfull \hbox (38.20032pt too wide) in paragraph at lines 75--76
+[]\T1/cmr/m/n/12 Evento_Colision ($[]$, ID_Satelite (FK), ID_Basura (FK), Ti-me
+s-tamp_Estimado,
+ []
+
+[19] [20]
+Overfull \hbox (34.24464pt too wide) in paragraph at lines 144--145
+[]\T1/cmr/m/n/12 Contacto_Estacion: re-suel-ve Sa-te-li-te $\OMS/cmsy/m/n/12 $$
+ \T1/cmr/m/n/12 Es-ta-cion_Terrena (atri-bu-tos: Ca-li-dad_Senal_dB,
+ []
+
+
+Overfull \hbox (29.57626pt too wide) in paragraph at lines 145--146
+[]\T1/cmr/m/n/12 Evento_Colision: re-suel-ve Sa-te-li-te $\OMS/cmsy/m/n/12 $$ \
+T1/cmr/m/n/12 Ba-su-ra_Espacial (atri-bu-tos: Pro-ba-bi-li-dad_Choque,
+ []
+
+[21]
+Underfull \hbox (badness 10000) in paragraph at lines 169--170
+[]|\T1/cmr/m/n/10 Privada o Gu-ber-na-men-tal
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 213--214
+[]|\T1/cmr/m/n/10 Rol: Ad-mi-nis-tra-dor, In-ge-nie-
+ []
+
+[22
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.1}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.243 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.2}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.243 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.3}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.243 
+      ]
+Underfull \hbox (badness 10000) in paragraph at lines 303--304
+[]|\T1/cmr/m/n/10 Bajo, Me-dio, Al-to, Cri-ti-co
+ []
+
+[23
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.4}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.310 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.5}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.310 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.6}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.310 
+      ] [24
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.7}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.389 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.8}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.389 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.9}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.389 
+      ]
+Underfull \hbox (badness 1067) in paragraph at lines 405--406
+[]|\T1/cmr/m/n/10 Probabilidad cal-cu-la-da de im-
+ []
+
+
+Underfull \hbox (badness 1221) in paragraph at lines 407--408
+[]|\T1/cmr/m/n/10 Distancia mí-ni-ma pre-di-cha en
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 409--410
+\T1/cmr/m/n/10 Es-qui-va-da, Fal-sa_Alarma
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 428--429
+[]|\T1/cmr/m/n/10 Alzamiento_Orbital, Des-cen-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 428--429
+\T1/cmr/m/n/10 so_Orbital, Ajus-te_Lateral
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 434--435
+[]|\T1/cmr/m/n/10 Exitosa, Fa-lli-da, Can-ce-la-da
+ []
+
+) [25{/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.10}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.25 \end{document}
+                   
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.11}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.25 \end{document}
+                   
+pdfTeX warning (ext4): destination with the same identifier (name{table.3.12}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.25 \end{document}
+                   ] (./main.aux
+LaTeX Info: Redefining \. on input line 11.
+LaTeX Info: Redefining \% on input line 11.
+)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+ ***********
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: 0FCC268487757317A7E7FA30BBD9592B;7600.
+ ) 
+Here is how much of TeX's memory you used:
+ 11442 strings out of 469453
+ 175734 string characters out of 5469037
+ 619720 words of memory out of 5000000
+ 39862 multiletter control sequences out of 15000+600000
+ 640274 words of font info for 63 fonts, out of 8000000 for 9000
+ 40 hyphenation exceptions out of 8191
+ 75i,10n,79p,1515b,783s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/font
+s/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
+10.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/sh
+are/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/share/texmf-dist/
+fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texmf-dist/fonts/type1/pub
+lic/cm-super/sfbx1728.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sf
+bx2488.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></us
+r/share/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texmf-d
+ist/fonts/type1/public/cm-super/sfrm1440.pfb></usr/share/texmf-dist/fonts/type1
+/public/cm-super/sfrm1728.pfb></usr/share/texmf-dist/fonts/type1/public/cm-supe
+r/sfrm2074.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb>
+</usr/share/texmf-dist/fonts/type1/public/cm-super/sftt1200.pfb>
+Output written on main.pdf (26 pages, 696676 bytes).
+PDF statistics:
+ 562 PDF objects out of 1000 (max. 8388607)
+ 421 compressed objects within 5 object streams
+ 99 named destinations out of 1000 (max. 500000)
+ 350 words of extra memory for PDF output out of 10000 (max. 10000000)
+

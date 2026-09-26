@@ -1,0 +1,9 @@
+{
+  "cssTheme": "macOS",
+  "theme": "system",
+  "enabledCssSnippets": [
+    "centrar-mermaid",
+    "whitesur-gtk"
+  ],
+  "baseFontSizeAction": false
+}

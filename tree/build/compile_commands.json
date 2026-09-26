@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/utec/Desktop/tree/build",
+  "command": "/usr/bin/c++ -std=gnu++20 -o CMakeFiles/tree.dir/src/main.cpp.o -c /home/utec/Desktop/tree/src/main.cpp",
+  "file": "/home/utec/Desktop/tree/src/main.cpp",
+  "output": "/home/utec/Desktop/tree/build/CMakeFiles/tree.dir/src/main.cpp.o"
+}
+]

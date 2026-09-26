@@ -1,0 +1,9 @@
+.mermaid {
+    display: flex;
+    justify-content: center;
+}
+
+/* .mermaid svg { */
+/*     min-width: 800px; /* Fuerza el tamaño para que no se vea miniatura */ */
+/*     height: auto; */
+/* } */

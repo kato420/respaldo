@@ -1,0 +1,739 @@
+\chapter{Modelo Relacional}
+
+\section{Modelo Relacional}
+
+A continuación se presentan los esquemas relacionales finales del sistema. Las llaves primarias se indican subrayadas y las llaves foráneas con la etiqueta (FK). Las llaves únicas alternativas se marcan con (UK).
+
+Nota sobre las relaciones: Todas las relaciones del modelo son de cardinalidad 1:N o 1:1, por lo que ninguna genera una tabla intermedia adicional; en su lugar, la llave foránea se inyecta en el lado ``N'' o en la entidad dependiente. Las entidades transaccionales (Resultado\_Diagnóstico, Insumo\_Utilizado, Procedimiento\_Aplicado, Receta\_Médica y Detalle\_Factura) resuelven asociaciones semánticamente N:M entre entidades fuertes, pero se modelan como entidades fuertes con PK surrogada y no como tablas de intersección puras.
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 1 Jerarquía de Personas}
+
+\begin{itemize}
+	\item Persona (\underline{ID\_Persona}, DNI (UK), Nombres, Apellidos, Teléfono, Email (UK))
+	\item Cliente (\underline{ID\_Persona} (FK), Dirección\_Principal, Contacto\_Emergencia)
+	\item Empleado (\underline{ID\_Persona} (FK), Código\_Empleado (UK), Fecha\_Contratación, Salario)
+	\item Veterinario (\underline{ID\_Persona} (FK), CMPV (UK), Especialidad)
+	\item Personal\_Apoyo (\underline{ID\_Persona} (FK), Rol, Licencia\_Conducir)
+\end{itemize}
+
+Relaciones absorbidas como FK no generan tabla propia:
+\begin{itemize}
+	\item Persona $\rightarrow$ Cliente (1:1): ID\_Persona es PK y FK en Cliente.
+	\item Persona $\rightarrow$ Empleado (1:1): ID\_Persona es PK y FK en Empleado.
+	\item Empleado $\rightarrow$ Veterinario (1:1): ID\_Persona es PK y FK en Veterinario.
+	\item Empleado $\rightarrow$ Personal\_Apoyo (1:1): ID\_Persona es PK y FK en Personal\_Apoyo.
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 2 Pacientes (Core Biológico)}
+
+\begin{itemize}
+	\item Especie (\underline{ID\_Especie}, Nombre\_Especie (UK))
+	\item Raza (\underline{ID\_Raza}, Nombre\_Raza, ID\_Especie (FK))
+	\item Mascota (\underline{ID\_Mascota}, Nombre, Fecha\_Nacimiento, Sexo, ID\_Raza (FK), ID\_Cliente (FK))
+	\item Historial\_Médico (\underline{ID\_Historial}, ID\_Mascota (FK, UK), Fecha\_Creación, Grupo\_Sanguíneo, Alergias\_Conocidas)
+\end{itemize}
+
+Relaciones absorbidas como FK no generan tabla propia:
+\begin{itemize}
+	\item Especie $\rightarrow$ Raza Clasifica (1:N): ID\_Especie como FK en Raza.
+	\item Cliente $\rightarrow$ Mascota Posee (1:N): ID\_Cliente como FK en Mascota.
+	\item Mascota $\rightarrow$ Historial Médico Tiene (1:1): ID\_Mascota como FK+UK en Historial\_Médico.
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 3 Catálogos e Inventario Especializado}
+
+\begin{itemize}
+	\item Item\_Catálogo (\underline{ID\_Item}, Nombre, Precio\_Base, Tipo\_Item)
+	\item Servicio (\underline{ID\_Item} (FK), Requiere\_Veterinario, Tiempo\_Estimado\_Min)
+	\item Artículo\_Petshop (\underline{ID\_Item} (FK), Marca, Categoría, Stock\_General)
+	\item Medicamento (\underline{ID\_Item} (FK), Principio\_Activo, Concentración, Presentación, Requiere\_Receta)
+	\item Lote\_Inventario (\underline{ID\_Lote}, ID\_Medicamento (FK), Fecha\_Caducidad, Cantidad\_Inicial, Stock\_Actual)
+\end{itemize}
+
+Relaciones absorbidas como FK no generan tabla propia:
+\begin{itemize}
+	\item Item\_Catálogo $\rightarrow$ Servicio (1:1 herencia JOINED): ID\_Item es PK y FK en Servicio.
+	\item Item\_Catálogo $\rightarrow$ Artículo\_Petshop (1:1 herencia JOINED): ID\_Item es PK y FK en Artículo\_Petshop.
+	\item Item\_Catálogo $\rightarrow$ Medicamento (1:1 herencia JOINED): ID\_Item es PK y FK en Medicamento.
+	\item Medicamento $\rightarrow$ Lote\_Inventario Almacena (1:N): ID\_Medicamento como FK en Lote\_Inventario.
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 4 Flujo Médico (Corazón Clínico)}
+
+\begin{itemize}
+	\item Cita (\underline{ID\_Cita}, Fecha, Hora, Motivo, Estado, ID\_Cliente (FK), ID\_Mascota (FK), Código\_Empleado (FK))
+	\item Atención\_Clínica (\underline{ID\_Atención}, ID\_Historial (FK), Código\_Empleado (FK), Fecha\_Hora, Motivo\_Real, Peso\_Kg, Temp\_C, Frecuencia\_Cardíaca, Anamnesis)
+	\item Enfermedad\_Diagnóstico (\underline{ID\_Enfermedad}, Código\_CIE (UK), Nombre\_Enfermedad)
+	\item Resultado\_Diagnóstico (\underline{ID\_Resultado}, ID\_Atención (FK), ID\_Enfermedad (FK), Tipo, Observaciones)
+	\item Procedimiento\_Aplicado (\underline{ID\_Procedimiento}, ID\_Atención (FK), ID\_Item (FK), Resultados\_Notas)
+	\item Insumo\_Utilizado (\underline{ID\_Insumo\_Uso}, ID\_Atención (FK), ID\_Lote (FK), Cantidad\_Usada)
+	\item Receta\_Médica (\underline{ID\_Receta}, ID\_Atención (FK), ID\_Medicamento (FK), Dosis\_Frecuencia, Duración\_Días)
+\end{itemize}
+
+Relaciones absorbidas como FK no generan tabla propia:
+\begin{itemize}
+	\item Cliente/Mascota/Empleado $\rightarrow$ Cita Involucra (1:N desde cada uno): FKs en Cita.
+	\item Historial Médico $\rightarrow$ Atención Clínica Registra (1:N): ID\_Historial como FK en Atención\_Clínica.
+	\item Veterinario $\rightarrow$ Atención Clínica Realiza (1:N): Código\_Empleado como FK en Atención\_Clínica.
+\end{itemize}
+
+Entidades que resuelven asociaciones N:M tienen tabla propia por atributos propios:
+\begin{itemize}
+	\item Resultado\_Diagnóstico: resuelve Atención Clínica $\rightarrow$ Enfermedad\_Diagnóstico (con atributo Tipo).
+	\item Procedimiento\_Aplicado: resuelve Atención\_Clínica $\rightarrow$ Servicio (con atributo Resultados\_Notas).
+	\item Insumo\_Utilizado: resuelve Atención\_Clínica $\rightarrow$ Lote\_Inventario (con atributo Cantidad\_Usada).
+	\item Receta\_Médica: resuelve Atención\_Clínica $\rightarrow$ Medicamento (con atributos Dosis\_Frecuencia, Duración\_Días).
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 5 Operativo Anexo}
+
+\begin{itemize}
+	\item Registro\_Estancia (\underline{ID\_Estancia}, ID\_Mascota (FK), Tipo, Fecha\_Ingreso, Fecha\_Salida, Nro\_Jaula, Instrucciones\_Cuidado)
+	\item Transporte\_Logística (\underline{ID\_Transporte}, ID\_Cita (FK), Código\_Empleado (FK), Tipo\_Ruta, Dirección\_Destino, Estado)
+\end{itemize}
+
+Relaciones absorbidas como FK no generan tabla propia:
+\begin{itemize}
+	\item Mascota $\rightarrow$ Registro\_Estancia Se hospeda (1:N): ID\_Mascota como FK en Registro\_Estancia.
+	\item Cita $\rightarrow$ Transporte\_Logística Requiere (1:1): ID\_Cita como FK en Transporte\_Logística.
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 6 Facturación y Finanzas}
+
+\begin{itemize}
+	\item Factura (\underline{ID\_Factura}, Fecha\_Emisión, Subtotal, IGV, Total, ID\_Cliente (FK), ID\_Atención (FK), ID\_Cita (FK))
+	\item Detalle\_Factura (\underline{ID\_Detalle}, ID\_Factura (FK), ID\_Item (FK), ID\_Lote (FK), ID\_Estancia (FK), Cantidad, Precio\_Unitario, Subtotal\_Línea)
+	\item Pago (\underline{ID\_Pago}, ID\_Factura (FK), Fecha\_Pago, Monto\_Abonado, Método\_Pago)
+\end{itemize}
+
+Relaciones absorbidas como FK no generan tabla propia:
+\begin{itemize}
+	\item Cliente $\rightarrow$ Factura Paga (1:N): ID\_Cliente como FK en Factura.
+	\item Atención/Cita $\rightarrow$ Factura Origina (1:1 opcional, mutuamente excluyente): FKs nullables con CHECK en Factura.
+	\item Factura $\rightarrow$ Pago Abona (1:N): ID\_Factura como FK en Pago.
+\end{itemize}
+
+Entidad que resuelve asociación N:M tiene tabla propia por atributos propios:
+\begin{itemize}
+	\item Detalle\_Factura: resuelve Factura $\rightarrow$ Item\_Catálogo (con atributos Cantidad, Precio\_Unitario, Subtotal\_Línea, y FKs opcionales a Lote y Estancia).
+\end{itemize}
+
+\section{Especificaciones de transformación}
+
+A continuación se describen las decisiones tomadas para transformar cada elemento del modelo conceptual Entidad-Relación al modelo relacional físico en PostgreSQL.
+
+\subsection{Entidades}
+
+Para transformar las entidades fuertes del modelo se han tenido en cuenta las siguientes especificaciones:
+
+\begin{itemize}
+	\item \textbf{Persona:} Su llave primaria es ID\_Persona, una clave surrogada autoincremenal de tipo INT. El DNI actúa como clave única alternativa (UK) dado que es un identificador de negocio sujeto a correcciones. Tiene como atributos los nombres, apellidos, teléfono y correo electrónico, siendo el email también UNIQUE.
+	\item \textbf{Especie:} Su llave primaria es ID\_Especie (surrogada). El atributo Nombre\_Especie es UNIQUE y NOT NULL para garantizar que no se registren duplicados de clasificaciones biológicas (ej. dos registros de ``Canino'').
+	\item \textbf{Raza:} Su llave primaria es ID\_Raza (surrogada). Tiene como atributos Nombre\_Raza y la llave foránea ID\_Especie. Se optó por PK surrogada en lugar de llave compuesta (Nombre\_Raza, ID\_Especie) para simplificar los JOINS.
+	\item \textbf{Mascota:} Su llave primaria es ID\_Mascota (surrogada). Tiene como atributos el nombre, fecha de nacimiento (nullable), y sexo. Incluye las llaves foráneas ID\_Raza e ID\_Cliente.
+	\item \textbf{Historial\_Médico:} Su llave primaria es ID\_Historial (surrogada). El atributo ID\_Mascota actúa como llave foránea y a la vez como clave única (FK, UK), lo que garantiza la relación 1:1 con Mascota a nivel de esquema. Almacena el grupo sanguíneo y alergias conocidas del paciente, ambos nullable.
+	\item \textbf{Item\_Catálogo:} Su llave primaria es ID\_Item (surrogada). Tiene como atributos el nombre del ítem, el precio base y un discriminador Tipo\_Item que indica si es un servicio, artículo de petshop o medicamento. Es la superclase de la jerarquía de catálogo.
+	\item \textbf{Lote\_Inventario:} Su llave primaria es ID\_Lote (surrogada). Almacena la fecha de caducidad, la cantidad inicial del lote y el stock actual. La FK ID\_Medicamento vincula el lote a su medicamento genérico.
+	\item \textbf{Cita:} Su llave primaria es ID\_Cita (surrogada). Tiene como atributos la fecha, hora, motivo de la visita y el estado actual. Las llaves foráneas ID\_Cliente, ID\_Mascota y Código\_Empleado son todas NOT NULL.
+	\item \textbf{Atención\_Clínica:} Su llave primaria es ID\_Atención (surrogada). Registra la fecha y hora del acto médico, el motivo real de la consulta y los signos vitales del triaje (peso, temperatura y frecuencia cardíaca), todos nullable. Las llaves foráneas ID\_Historial y Código\_Empleado son NOT NULL.
+	\item \textbf{Enfermedad\_Diagnóstico:} Su llave primaria es ID\_Enfermedad (surrogada). El Código\_CIE actúa como clave única alternativa para estandarizar la nomenclatura médica. El Nombre\_Enfermedad es NOT NULL.
+	\item \textbf{Registro\_Estancia:} Su llave primaria es ID\_Estancia (surrogada). Almacena el tipo de estadía, la fecha de ingreso, la fecha de salida (nullable), el número de jaula asignado y las instrucciones de cuidado (nullable). La FK ID\_Mascota es NOT NULL.
+	\item \textbf{Transporte\_Logística:} Su llave primaria es ID\_Transporte (surrogada). Tiene como atributos el tipo de ruta, la dirección de destino y el estado del servicio. El campo Estado acepta los valores controlados Pendiente, En curso, Completado y Cancelado (CHECK constraint). Las llaves foráneas ID\_Cita y Código\_Empleado son NOT NULL.
+	\item \textbf{Factura:} Su llave primaria es ID\_Factura (surrogada). Almacena la fecha de emisión, el subtotal, el IGV calculado y el total a pagar. La FK ID\_Cliente es NOT NULL; las FKs ID\_Atención e ID\_Cita son nullables y mutuamente excluyentes (CHECK constraint).
+	\item \textbf{Pago:} Su llave primaria es ID\_Pago (surrogada). Registra la fecha del pago, el monto abonado y el método de pago utilizado. La FK ID\_Factura es NOT NULL, habilitando pagos fraccionados (múltiples pagos por factura).
+\end{itemize}
+
+\subsection{Entidades débiles}
+
+En el modelo conceptual original no se identificaron entidades débiles en sentido estricto (es decir, entidades cuya existencia y unicidad dependan completamente de una entidad propietaria mediante una llave parcial). Todas las entidades que en un diseño tradicional podrían haberse modelado como débiles —como Atención\_Clínica respecto a Historial\_Médico, o Detalle\_Factura respecto a Factura— fueron convertidas intencionalmente en entidades fuertes con PK surrogada autoincremenal. Esta decisión de diseño elimina la necesidad de llaves compuestas derivadas de la entidad propietaria, simplifica las operaciones de JOIN y mejora el rendimiento transaccional en tablas con alto volumen de inserciones.
+
+\subsection{Entidades superclase / subclases}
+
+El modelo contempla dos jerarquías de herencia implementadas mediante el patrón Table Per Subclass (JOINED) de PostgreSQL:
+
+\begin{itemize}
+	\item \textbf{Jerarquía de Personas:} La superclase Persona se divide en las subclases Cliente y Empleado. A su vez, Empleado se subdivide en Veterinario y Personal\_Apoyo. En todos los casos, la PK de la subclase es ID\_Persona, que actúa simultáneamente como FK hacia la tabla padre. No se genera una nueva clave en las subclases. Se permite el solapamiento entre Cliente y Empleado (un empleado puede también ser cliente de la clínica). La cobertura es total para Empleado: todo empleado debe ser Veterinario o Personal\_Apoyo.
+	\item \textbf{Jerarquía de Ítems de Catálogo:} La superclase Item\_Catálogo se divide en las subclases Servicio, Artículo\_Petshop y Medicamento. Siguiendo el mismo patrón JOINED, la PK de cada subclase es ID\_Item, que actúa también como FK hacia Item\_Catálogo. El atributo Tipo\_Item en la superclase actúa como discriminador para identificar la subclase concreta de cada registro. La cobertura es total: todo ítem del catálogo debe pertenecer a exactamente una de las tres subclases.
+\end{itemize}
+
+\subsection{Relaciones binarias}
+
+Para transformar las relaciones binarias del modelo conceptual al esquema relacional se aplicaron las siguientes reglas, en función de la cardinalidad de cada relación:
+
+\textbf{Relaciones 1:1} La llave primaria del lado participante total (o de la entidad dependiente) recibe la FK de la entidad referenciada. En este modelo:
+\begin{itemize}
+	\item Mascota $\rightarrow$ Historial Médico (Tiene): ID\_Mascota se incluye como FK + UK en Historial\_Médico. La restricción UNIQUE garantiza que no puedan existir dos historiales para la misma mascota.
+	\item Cita $\rightarrow$ Transporte\_Logística (Requiere): ID\_Cita se incluye como FK en Transporte\_Logística, que es el lado de participación total.
+	\item Atención/Cita $\rightarrow$ Factura (Origina): Ambas FKs son nullables en Factura y se controlan mediante un CHECK de exclusión mutua.
+\end{itemize}
+
+\textbf{Relaciones 1:N} La llave primaria del lado ``1'' se inyecta como FK en el lado ``N''. En este modelo todas las relaciones estructurales y de flujo siguen este patrón:
+\begin{itemize}
+	\item Especie $\rightarrow$ Raza: ID\_Especie como FK en Raza.
+	\item Cliente $\rightarrow$ Mascota: ID\_Cliente como FK en Mascota.
+	\item Medicamento $\rightarrow$ Lote\_Inventario: ID\_Medicamento como FK en Lote\_Inventario.
+	\item Historial Médico $\rightarrow$ Atención\_Clínica: ID\_Historial como FK en Atención\_Clínica.
+	\item Atención Clínica $\rightarrow$ Resultado\_Diagnóstico, Procedimiento\_Aplicado, Insumo\_Utilizado, Receta\_Médica: ID\_Atención como FK en cada tabla transaccional.
+	\item Mascota $\rightarrow$ Registro\_Estancia: ID\_Mascota como FK en Registro\_Estancia.
+	\item Cliente $\rightarrow$ Factura: ID\_Cliente como FK en Factura.
+	\item Factura $\rightarrow$ Detalle\_Factura: ID\_Factura como FK en Detalle\_Factura.
+	\item Factura $\rightarrow$ Pago: ID\_Factura como FK en Pago.
+\end{itemize}
+
+\textbf{Relaciones N:M resueltas como entidades fuertes} Dado que todas las asociaciones semánticamente N:M del modelo presentan atributos propios relevantes, fueron modeladas como entidades fuertes con PK surrogada en lugar de tablas de intersección puras. Esto aplica a: Resultado\_Diagnóstico, Procedimiento\_Aplicado, Insumo\_Utilizado, Receta\_Médica y Detalle\_Factura.
+
+\subsection{Relaciones ternarias}
+
+Para la elaboración del modelo no se consideraron relaciones ternarias. Todas las asociaciones que involucran a tres entidades simultáneamente —como la relación Involucra entre Cliente, Mascota y Empleado hacia Cita— fueron resueltas incorporando múltiples llaves foráneas directamente en la entidad resultante (Cita), tratándolas como tres relaciones binarias independientes 1:N convergentes. Este enfoque simplifica el esquema y evita la complejidad que conlleva una tabla ternaria pura.
+
+\section{Diccionario de datos}
+
+A continuación se presenta el diccionario de datos del sistema, con una tabla por cada entidad del modelo relacional. Se detallan el nombre de cada campo, su tipo de dato en PostgreSQL, si actúa como llave primaria (PK) y/o foránea (FK), y una descripción funcional del atributo.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Persona & INT (SERIAL) & X & & Identificador surrogado autoincremenal \\
+\hline
+DNI & VARCHAR(8) & & & Documento Nacional de Identidad (UK) \\
+\hline
+Nombres & VARCHAR(50) & & & Nombres de pila de la persona \\
+\hline
+Apellidos & VARCHAR(50) & & & Apellidos de la persona \\
+\hline
+Teléfono & VARCHAR(15) & & & Número de teléfono de contacto \\
+\hline
+Email & VARCHAR(100) & & & Correo electrónico (UK) \\
+\hline
+\end{tabular}
+\caption{Tabla Persona}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Persona & INT & X & X & FK Persona. Herencia JOINED \\
+\hline
+Dirección\_Principal & VARCHAR(150) & & & Dirección fiscal del cliente \\
+\hline
+Contacto\_Emergencia & VARCHAR(100) & & & Contacto alternativo (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Cliente}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Persona & INT & X & X & FK Persona. Herencia JOINED \\
+\hline
+Código\_Empleado & VARCHAR(20) & & & Código interno de RRHH (UK) \\
+\hline
+Fecha\_Contratación & DATE & & & Fecha de inicio del vínculo laboral \\
+\hline
+Salario & DECIMAL(10,2) & & & Salario base mensual (referencial) \\
+\hline
+\end{tabular}
+\caption{Tabla Empleado}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Persona & INT & X & X & FK Empleado. Herencia JOINED \\
+\hline
+CMPV & VARCHAR(15) & & & Nro. de colegiatura CMPV (UK) \\
+\hline
+Especialidad & VARCHAR(50) & & & Especialidad médica veterinaria \\
+\hline
+\end{tabular}
+\caption{Tabla Veterinario}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Persona & INT & X & X & FK Empleado. Herencia JOINED \\
+\hline
+Rol & VARCHAR(30) & & & Función: groomer, chofer, recepcionista \\
+\hline
+Licencia\_Conducir & VARCHAR(20) & & & Nro. licencia de conducir (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Personal\_Apoyo}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Especie & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+Nombre\_Especie & VARCHAR(50) & & & Nombre de la especie (UK) \\
+\hline
+\end{tabular}
+\caption{Tabla Especie}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Raza & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+Nombre\_Raza & VARCHAR(50) & & & Nombre de la raza \\
+\hline
+ID\_Especie & INT & & X & FK Especie. Clasificación biológica \\
+\hline
+\end{tabular}
+\caption{Tabla Raza}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Mascota & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+Nombre & VARCHAR(50) & & & Nombre de la mascota \\
+\hline
+Fecha\_Nacimiento & DATE & & & Fecha de nacimiento (nullable) \\
+\hline
+Sexo & CHAR(1) & & & Sexo del paciente: M o H \\
+\hline
+ID\_Raza & INT & & X & FK Raza \\
+\hline
+ID\_Cliente & INT & & X & FK Cliente. Dueño responsable \\
+\hline
+\end{tabular}
+\caption{Tabla Mascota}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Historial & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Mascota & INT & & X & FK Mascota (UK: relación 1:1) \\
+\hline
+Fecha\_Creación & TIMESTAMP & & & Fecha de apertura del expediente \\
+\hline
+Grupo\_Sanguíneo & VARCHAR(20) & & & Grupo sanguíneo (nullable) \\
+\hline
+Alergias\_Conocidas & TEXT & & & Alergias registradas (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Historial\_Médico}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Item & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+Nombre & VARCHAR(100) & & & Nombre del ítem de catálogo \\
+\hline
+Precio\_Base & DECIMAL(10,2) & & & Precio unitario base en soles \\
+\hline
+Tipo\_Item & VARCHAR(20) & & & Discriminador: Servicio, Articulo, Medicamento \\
+\hline
+\end{tabular}
+\caption{Tabla Item\_Catálogo}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Item & INT & X & X & FK Item\_Catálogo. Herencia JOINED \\
+\hline
+Requiere\_Veterinario & BOOLEAN & & & \textquestiondown Requiere médico habilitado? \\
+\hline
+Tiempo\_Estimado\_Min & INT & & & Duración estimada en minutos (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Servicio}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Item & INT & X & X & FK Item\_Catálogo. Herencia JOINED \\
+\hline
+Marca & VARCHAR(50) & & & Marca comercial (nullable) \\
+\hline
+Categoría & VARCHAR(50) & & & Categoría del artículo \\
+\hline
+Stock\_General & INT & & & Unidades disponibles (DEFAULT 0) \\
+\hline
+\end{tabular}
+\caption{Tabla Artículo\_Petshop}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Item & INT & X & X & FK Item\_Catálogo. Herencia JOINED \\
+\hline
+Principio\_Activo & VARCHAR(100) & & & Compuesto farmacológico principal \\
+\hline
+Concentración & VARCHAR(50) & & & Concentración del principio activo \\
+\hline
+Presentación & VARCHAR(50) & & & Forma farmacéutica (tableta, jarabe, etc.) \\
+\hline
+Requiere\_Receta & BOOLEAN & & & \textquestiondown Dispensación con receta obligatoria? \\
+\hline
+\end{tabular}
+\caption{Tabla Medicamento}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Lote & INT (SERIAL) & X & & Identificador surrogado del lote \\
+\hline
+ID\_Medicamento & INT & & X & FK Medicamento. Fármaco del lote \\
+\hline
+Fecha\_Caducidad & DATE & & & Fecha de vencimiento del lote \\
+\hline
+Cantidad\_Inicial & INT & & & Unidades ingresadas al recibir el lote \\
+\hline
+Stock\_Actual & INT & & & Unidades disponibles actualmente \\
+\hline
+\end{tabular}
+\caption{Tabla Lote\_Inventario}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Cita & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+Fecha & DATE & & & Fecha programada de la cita \\
+\hline
+Hora & TIME & & & Hora programada de la cita \\
+\hline
+Motivo & TEXT & & & Razón de la visita declarada por el cliente \\
+\hline
+Estado & VARCHAR(20) & & & Estado: Pendiente, Confirmada, Completada, Cancelada \\
+\hline
+ID\_Cliente & INT & & X & FK Cliente. Solicitante de la cita \\
+\hline
+ID\_Mascota & INT & & X & FK Mascota. Paciente de la cita \\
+\hline
+Código\_Empleado & VARCHAR(20) & & X & FK Empleado (UK). Profesional asignado \\
+\hline
+\end{tabular}
+\caption{Tabla Cita}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Atención & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Historial & INT & & X & FK Historial\_Médico \\
+\hline
+Código\_Empleado & VARCHAR(20) & & X & FK Empleado (UK). Veterinario responsable \\
+\hline
+Fecha\_Hora & TIMESTAMP & & & Fecha y hora del acto médico \\
+\hline
+Motivo\_Real & TEXT & & & Motivo real detectado en consulta \\
+\hline
+Peso\_Kg & DECIMAL(5,2) & & & Peso del paciente en kg (nullable) \\
+\hline
+Temp\_C & DECIMAL(4,1) & & & Temperatura corporal en °C (nullable) \\
+\hline
+Frecuencia\_Cardíaca & INT & & & Latidos por minuto (nullable) \\
+\hline
+Anamnesis & TEXT & & & Relato clínico del dueño (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Atención\_Clínica}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Enfermedad & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+Código\_CIE & VARCHAR(15) & & & Código CIE estandarizado (UK) \\
+\hline
+Nombre\_Enfermedad & VARCHAR(100) & & & Nombre completo de la patología \\
+\hline
+\end{tabular}
+\caption{Tabla Enfermedad\_Diagnóstico}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Resultado & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Atención & INT & & X & FK Atención\_Clínica \\
+\hline
+ID\_Enfermedad & INT & & X & FK Enfermedad\_Diagnóstico \\
+\hline
+Tipo & VARCHAR(20) & & & Presuntivo o Definitivo \\
+\hline
+Observaciones & TEXT & & & Notas adicionales del médico (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Resultado\_Diagnóstico}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Procedimiento & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Atención & INT & & X & FK Atención\_Clínica \\
+\hline
+ID\_Item & INT & & X & FK Servicio (subclase de Item\_Catálogo) \\
+\hline
+Resultados\_Notas & TEXT & & & Hallazgos del procedimiento (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Procedimiento\_Aplicado}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Insumo\_Uso & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Atención & INT & & X & FK Atención\_Clínica \\
+\hline
+ID\_Lote & INT & & X & FK Lote\_Inventario. Lote consumido \\
+\hline
+Cantidad\_Usada & INT & & & Unidades consumidas del lote \\
+\hline
+\end{tabular}
+\caption{Tabla Insumo\_Utilizado}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Receta & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Atención & INT & & X & FK Atención\_Clínica \\
+\hline
+ID\_Medicamento & INT & & X & FK Medicamento (genérico) \\
+\hline
+Dosis\_Frecuencia & VARCHAR(100) & & & Posología: dosis y frecuencia \\
+\hline
+Duración\_Días & INT & & & Días de tratamiento indicados \\
+\hline
+\end{tabular}
+\caption{Tabla Receta\_Médica}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Estancia & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Mascota & INT & & X & FK Mascota \\
+\hline
+Tipo & VARCHAR(20) & & & Guardería o Internamiento \\
+\hline
+Fecha\_Ingreso & TIMESTAMP & & & Fecha y hora de ingreso a instalaciones \\
+\hline
+Fecha\_Salida & TIMESTAMP & & & Fecha y hora de alta (nullable) \\
+\hline
+Nro\_Jaula & VARCHAR(10) & & & Identificador alfanumérico de la jaula o espacio asignado \\
+\hline
+Instrucciones\_Cuidado & TEXT & & & Indicaciones especiales (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Registro\_Estancia}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Transporte & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Cita & INT & & X & FK Cita \\
+\hline
+Código\_Empleado & VARCHAR(20) & & X & FK Empleado (UK). Chofer asignado \\
+\hline
+Tipo\_Ruta & VARCHAR(20) & & & Recojo o Entrega \\
+\hline
+Dirección\_Destino & VARCHAR(150) & & & Dirección de recojo o entrega \\
+\hline
+Estado & VARCHAR(20) & & & Pendiente, En curso, Completado, Cancelado \\
+\hline
+\end{tabular}
+\caption{Tabla Transporte\_Logística}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Factura & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+Fecha\_Emisión & TIMESTAMP & & & Fecha y hora de emisión \\
+\hline
+Subtotal & DECIMAL(10,2) & & & Monto antes de impuestos \\
+\hline
+IGV & DECIMAL(10,2) & & & Impuesto General a las Ventas \\
+\hline
+Total & DECIMAL(10,2) & & & Monto total a pagar \\
+\hline
+ID\_Cliente & INT & & X & FK Cliente. Titular de la factura \\
+\hline
+ID\_Atención & INT & & X & FK Atención\_Clínica (nullable) \\
+\hline
+ID\_Cita & INT & & X & FK Cita (nullable, CHECK exclusión mutua) \\
+\hline
+\end{tabular}
+\caption{Tabla Factura}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Detalle & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Factura & INT & & X & FK Factura \\
+\hline
+ID\_Item & INT & & X & FK Item\_Catálogo \\
+\hline
+ID\_Lote & INT & & X & FK Lote\_Inventario (nullable) \\
+\hline
+ID\_Estancia & INT & & X & FK Registro\_Estancia (nullable) \\
+\hline
+Cantidad & INT & & & Unidades cobradas \\
+\hline
+Precio\_Unitario & DECIMAL(10,2) & & & Precio unitario vigente al facturar \\
+\hline
+Subtotal\_Línea & DECIMAL(10,2) & & & Precio Unitario * Cantidad \\
+\hline
+\end{tabular}
+\caption{Tabla Detalle\_Factura}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Pago & INT (SERIAL) & X & & Identificador surrogado \\
+\hline
+ID\_Factura & INT & & X & FK Factura \\
+\hline
+Fecha\_Pago & TIMESTAMP & & & Fecha y hora del abono \\
+\hline
+Monto\_Abonado & DECIMAL(10,2) & & & Monto pagado en esta transacción \\
+\hline
+Método\_Pago & VARCHAR(20) & & & Efectivo, Tarjeta, Yape, Plin, etc. \\
+\hline
+\end{tabular}
+\caption{Tabla Pago}
+\end{table}

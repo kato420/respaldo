@@ -1,0 +1,258 @@
+\chapter{Requisitos}
+
+\section{Introducción}
+
+En la última década, el sector de servicios veterinarios en el Perú ha experimentado un crecimiento notable impulsado por el aumento sostenido en la tenencia responsable de mascotas y la mayor disposición de las familias a invertir en su bienestar y salud. En este contexto, las clínicas veterinarias que aspiran a mantenerse competitivas ya no pueden limitarse a ofrecer una consulta médica aislada; deben operar como organizaciones de servicios complejas, capaces de integrar procesos clínicos, logísticos y comerciales de forma simultánea y coherente. SOS Veterinaria, ubicada en la Av. Mariscal La Mar 835, Miraflores, Lima, es un ejemplo representativo de esta evolución. Lo que comenzó como una clínica de consulta general se ha transformado en un ecosistema integral que combina atención médica especializada, cirugía, laboratorio diagnóstico, hospedaje, estética animal (grooming), transporte logístico a domicilio y venta de productos a través de un petshop presencial y una plataforma de comercio electrónico. Esta diversificación, si bien constituye una ventaja competitiva evidente, ha generado simultáneamente un desafío de gestión de información de alta complejidad. El presente proyecto surge de la necesidad de diseñar e implementar una base de datos relacional integral en PostgreSQL que unifique en un único sistema transaccional todos los procesos operativos de SOS Veterinaria. El objetivo es eliminar la fragmentación de datos existente, garantizar la trazabilidad completa del flujo de atención y facturación, y sentar las bases para la generación de reportes analíticos que apoyen la toma de decisiones estratégicas de la dirección.
+
+\section{Descripción general de la empresa}
+
+SOS Veterinaria opera bajo un modelo de negocio centralizado en un único pero amplio local ubicado en el distrito de Miraflores, Lima. Esta concentración en una sola sede le permite optimizar recursos físicos y humanos, pero al mismo tiempo implica que todos los flujos de información clínicos, comerciales y logísticos convergen en el mismo espacio operativo, lo que exige una coordinación interna rigurosa. El local está organizado en cuatro grandes áreas funcionales:
+
+\begin{itemize}
+	\item \textbf{Área médica y quirúrgica:} Comprende los consultorios de atención general y especializada (cardiología, oncología, traumatología, neurología, nutrición y oftalmología), las salas de cirugía convencional y de mínima invasión (laparoscopia y endoscopia), el laboratorio clínico con capacidad para hemogramas, perfiles bioquímicos, análisis de orina, pruebas PCR, ELISA y cultivos bacteriológicos, y la unidad de diagnóstico por imágenes (rayos X y ecografía de alta resolución). Adicionalmente, dispone de atención de emergencias las 24 horas.
+	\item \textbf{Área de farmacia e inventario:} Gestiona el stock de medicamentos, insumos clínicos y productos de venta libre. Los medicamentos se organizan en lotes físicos con fechas de caducidad propias, cuyo control es crítico tanto para la seguridad del paciente como para la integridad del inventario.
+	\item \textbf{Área de hospedaje y estética:} Incluye las instalaciones de internamiento postoperatorio y guardería vacacional, con jaulas y caniles diferenciados por especie, así como el área de grooming (baño regular, baño medicado, corte higiénico y corte estético).
+	\item \textbf{Área operativa de transporte:} Gestiona el servicio de taxi y transporte logístico a domicilio para el recojo y entrega de mascotas, coordinado por personal de apoyo con licencia de conducir habilitada.
+\end{itemize}
+
+La clínica atiende a clientes particulares y ofrece, adicionalmente, una tienda en línea (sosveterinaria.com) para la venta de productos de petshop con envío a domicilio, lo que amplía su alcance comercial más allá del local físico.
+
+\section{Necesidad / usos de la base de datos}
+
+La coexistencia de múltiples líneas de negocio dentro de un único establecimiento genera una demanda de información transversal que los sistemas actuales de SOS Veterinaria son incapaces de satisfacer. La problemática central reside en la imposibilidad de cruzar datos entre los distintos procesos operativos: la información sobre los medicamentos que un veterinario receta en consulta no está vinculada con los lotes que la farmacia gestiona en su stock, y estos, a su vez, no se conectan automáticamente con los cargos que recepción registra en la factura del cliente.
+
+La base de datos propuesta es necesaria para resolver, de manera sistemática, los siguientes requerimientos operativos:
+
+\begin{itemize}
+	\item \textbf{Gestión de inventario farmacéutico perecible:} Controlar los lotes de medicamentos con sus fechas de caducidad, cantidades iniciales y stock actual, garantizando que no se administren ni vendan fármacos vencidos y que las mermas queden registradas.
+	\item \textbf{Asignación y control de jaulas:} Registrar el ingreso y salida de mascotas de las instalaciones de hospedaje e internamiento, con trazabilidad del número de jaula asignado, las instrucciones de cuidado y los períodos de ocupación para fines de facturación.
+	\item \textbf{Historiales clínicos inmutables:} Mantener un registro cronológico e inalterable de todas las atenciones, diagnósticos, procedimientos, recetas e insumos utilizados por cada mascota, con respaldo legal para los actos médicos firmados por el veterinario responsable.
+	\item \textbf{Facturación polimórfica:} Emitir comprobantes que consoliden en un mismo ticket tanto servicios médicos como productos físicos (medicamentos, artículos de petshop) y estancias de hospedaje, con soporte para pagos fraccionados mediante distintos métodos (efectivo, tarjeta, billeteras digitales).
+	\item \textbf{Trazabilidad del ciclo de inventario:} Vincular el despacho de un medicamento en el mostrador directamente al lote específico del que proviene, cerrando el ciclo entre la prescripción médica, la dispensación farmacéutica y el descuento de stock.
+\end{itemize}
+
+\section{¿Cómo resuelve el problema hoy?}
+
+\subsection{Cómo se almacenan y procesan los datos hoy}
+
+En la actualidad, SOS Veterinaria gestiona su información a través de un conjunto desarticulado de herramientas analógicas y digitales de uso básico, sin integración entre sí. Cada área opera de forma autónoma con sus propios métodos de registro:
+
+\begin{itemize}
+	\item \textbf{Recepción:} Mantiene un archivo de Microsoft Excel para el registro de citas, donde se anotan manualmente la fecha, el motivo de consulta, el cliente y la mascota involucrada. No existe validación de datos ni control de duplicados.
+	\item \textbf{Área médica:} Los veterinarios documentan los historiales clínicos, diagnósticos, recetas y notas de procedimientos en cuadernos físicos o fichas de papel archivadas por mascota. Estos registros son de difícil consulta retrospectiva, propensos al deterioro físico y no accesibles simultáneamente por más de un profesional.
+	\item \textbf{Farmacia e inventario:} El control de lotes y stock de medicamentos se lleva en una hoja de cálculo de Excel independiente, actualizada de forma manual cada vez que se realiza una compra o dispensación. Las fechas de caducidad no generan alertas automáticas, lo que incrementa el riesgo de administrar fármacos vencidos.
+	\item \textbf{Hospedaje:} La ocupación de jaulas se gestiona con anotaciones en papel o en un registro físico de entradas y salidas, sin vinculación con el sistema de facturación ni con el historial clínico de la mascota internada.
+\end{itemize}
+
+El resultado es un conjunto de silos de información desconectados, donde la generación de cualquier reporte consolidado (por ejemplo, los ingresos totales del mes o el stock disponible de un medicamento específico) requiere cruzar manualmente múltiples fuentes, con el consecuente riesgo de inconsistencias y errores.
+
+\subsection{Flujo de datos}
+
+El flujo de datos actual en SOS Veterinaria es predominantemente manual, secuencial y propenso a la pérdida de trazabilidad en cada punto de transferencia. A continuación se describe el ciclo típico de una atención clínica con intervención quirúrgica:
+
+\begin{enumerate}
+	\item El cliente solicita una cita por teléfono; recepción la anota en el Excel de citas.
+	\item El veterinario atiende al paciente y registra los hallazgos en su cuaderno físico.
+	\item Durante la intervención, el médico anota en un papel los insumos y medicamentos utilizados (jeringas, ampollas, soluciones).
+	\item Ese papel es entregado a recepción para que transcriba los ítems a la boleta del cliente, sin que exista ningún mecanismo que garantice que los insumos anotados correspondan exactamente al lote específico descontado del almacén.
+	\item La farmacia actualiza su Excel de stock de forma separada y posterior, sin vinculación directa con el acto clínico que generó el consumo.
+	\item El cliente paga en caja; el recibo se emite de forma manual o con un sistema de facturación básico no integrado con los registros médicos ni de inventario.
+\end{enumerate}
+
+Este flujo produce una pérdida sistemática de trazabilidad: al final del proceso es imposible determinar con certeza qué lote exacto de medicamento fue administrado a un paciente específico en una fecha determinada, información que es crítica tanto para la auditoría de inventario como para la seguridad clínica del animal.
+
+\section{Descripción detallada del sistema}
+
+\subsection{Objetos de información actuales}
+
+Los objetos de información que actualmente existen en SOS Veterinaria, y que serán migrados y formalizados en la base de datos relacional propuesta, son los siguientes:
+
+\begin{itemize}
+	\item \textbf{Formularios en papel:} Fichas de anamnesis, hojas de consentimiento quirúrgico, notas de evolución y registros de internamiento. Almacenados físicamente en archivadores por orden cronológico o alfabético.
+	\item \textbf{Hojas de cálculo de Excel desconectadas:} Registro de citas (recepción), control de lotes de medicamentos (farmacia) y registro de hospedajes (área de internamiento). Cada archivo es mantenido por un área distinta sin sincronización entre ellos.
+	\item \textbf{Cuadernos de historiales médicos:} Documentos físicos por mascota donde los veterinarios anotan consultas, diagnósticos, prescripciones y observaciones postoperatorias.
+	\item \textbf{Boletas y recibos manuales:} Comprobantes de pago emitidos en talonarios físicos o mediante sistemas de punto de venta básicos sin integración con los registros clínicos ni de inventario.
+\end{itemize}
+
+Todos estos objetos serán migrados a una base de datos relacional en PostgreSQL, diseñada para soportar hasta 1~000~000 de registros en tablas transaccionales y mantener la integridad referencial mediante llaves primarias surrogadas y restricciones de integridad a nivel de esquema.
+
+\subsection{Características esperadas}
+
+El sistema de base de datos a implementar deberá cumplir con las siguientes características técnicas y funcionales:
+
+\begin{itemize}
+	\item \textbf{Alta disponibilidad:} El sistema debe estar operativo de forma continua, dado que SOS Veterinaria ofrece atención de emergencias las 24 horas. Se implementará sobre PostgreSQL con soporte para replicación y recuperación ante fallos.
+	\item \textbf{Integridad referencial mediante llaves surrogadas:} Todas las entidades utilizarán claves primarias surrogadas simples (enteros autoincrementales) en lugar de llaves compuestas o naturales y eficiencia en operaciones de JOIN.
+	\item \textbf{Trazabilidad de inventario:} El sistema debe registrar el descuento de stock a nivel de lote específico, tanto en el quirófano (insumos utilizados) como en el mostrador de farmacia (venta directa al cliente), cerrando el ciclo de inventario de extremo a extremo.
+	\item \textbf{Facturación polimórfica:} Un único módulo de facturación debe ser capaz de consolidar en una misma boleta servicios médicos, artículos de petshop y cobros de hospedaje, con soporte para pagos fraccionados en múltiples cuotas y métodos.
+	\item \textbf{Soporte para consultas analíticas:} La estructura del esquema debe permitir la ejecución eficiente de consultas de agregación y cruce de datos complejos (reportes epidemiológicos, análisis de stock, rentabilidad por tipo de servicio) sin degradar el rendimiento transaccional.
+\end{itemize}
+
+\subsection{Tipos de usuarios}
+
+El sistema contempla cuatro perfiles de usuario con distintos niveles de acceso y responsabilidad operativa:
+
+\begin{enumerate}
+	\item \textbf{Administrador / Dueño:} Acceso total al sistema. Puede consultar y modificar cualquier entidad, generar reportes consolidados de ingresos y stock, gestionar el catálogo de servicios y productos, y administrar las cuentas de los demás usuarios.
+	\item \textbf{Veterinario:} Acceso al módulo clínico. Puede registrar y consultar historiales médicos, crear atenciones clínicas, emitir diagnósticos, prescribir recetas médicas, registrar procedimientos aplicados e insumos utilizados. No tiene acceso a los módulos de facturación ni de administración de personal.
+	\item \textbf{Personal de Apoyo / Recepción:} Acceso a los módulos de facturación, gestión de citas, registro de estancias de hospedaje y venta de productos en el petshop. Puede emitir facturas, registrar pagos y coordinar el agendamiento de citas. No tiene acceso a los registros clínicos confidenciales.
+	\item \textbf{Chofer:} Acceso exclusivo al módulo de transporte logístico. Puede consultar las rutas asignadas para el día (dirección de recojo o entrega, horario, mascota asociada) y registrar la confirmación de entrega. No tiene acceso a ningún otro módulo del sistema.
+\end{enumerate}
+
+\subsection{Tipos de consulta}
+
+El sistema deberá ser capaz de responder, de forma eficiente, a las siguientes consultas analíticas representativas de las necesidades de información de SOS Veterinaria:
+
+\begin{description}
+	\item[\textbf{Q1} Epidemiología por raza:] ¿Cuáles son las enfermedades más diagnosticadas en una raza específica durante el último semestre? Esta consulta permite identificar patrones clínicos recurrentes y orientar la especialización del equipo médico.
+	\item[\textbf{Q2} Alerta de stock crítico:] ¿Cuál es el top 5 de medicamentos más prescritos cuyo stock actual esté por debajo del 15\% de su cantidad inicial en inventario? Esta consulta es crítica para anticipar quiebres de stock en la farmacia.
+	\item[\textbf{Q3} Rentabilidad por canal y método de pago:] ¿Cuáles son los ingresos totales agrupados por método de pago (efectivo, tarjeta, Yape/Plin) y tipo de ítem (Petshop vs. Médico) durante el último trimestre? Esta consulta apoya la planificación financiera y la evaluación de la mezcla de productos.
+	\item[\textbf{Q4} Rendimiento del servicio de transporte:] ¿Qué chofer ha completado el mayor número de transportes en el período, agrupados por distrito de destino? Esta consulta permite optimizar la asignación de rutas y evaluar el rendimiento del personal de transporte.
+\end{description}
+
+\subsection{Tamaño estimado de la base de datos}
+
+A continuación se presenta la estimación del tamaño de la base de datos considerando los tipos de datos reales de PostgreSQL para cada atributo. Los cálculos se basan en los tamaños estándar: $INT=4$ bytes, $BIGINT/TIMESTAMP=8$ bytes, $DECIMAL(10,2)=8$ bytes, $BOOLEAN=1$ byte, $DATE=4$ bytes, $TIME=8$ bytes, $VARCHAR(n)=n$ bytes (promedio estimado), $TEXT=200$ bytes (promedio estimado).
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lcc}
+\toprule
+\textbf{Nombre de la tabla} & \textbf{Longitud de atributos en Bytes} & \textbf{Longitud del registro (Bytes)} \\
+\midrule
+Persona & $4+8+50+50+15+100$ & 227 \\
+Cliente & $4+150+100$ & 254 \\
+Empleado & $4+20+4+8$ & 36 \\
+Veterinario & $4+15+50$ & 69 \\
+Personal\_Apoyo & $4+30+20$ & 54 \\
+Especie & $4+50$ & 54 \\
+Raza & $4+50+4$ & 58 \\
+Mascota & $4+50+4+1+4+4$ & 67 \\
+Historial Médico & $4+4+8+20+200$ & 236 \\
+Item\_Catálogo & $4+100+8+20$ & 132 \\
+Servicio & $4+1+4$ & 9 \\
+Artículo Petshop & $4+50+50+4$ & 108 \\
+Medicamento & $4+100+50+50+1$ & 205 \\
+Lote\_Inventario & $4+4+4+4+4$ & 20 \\
+Cita & $4+4+8+200+20+4+4+20$ & 264 \\
+Atención Clínica & $4+4+20+8+200+8+8+4+200$ & 456 \\
+Enfermedad\_Diagnóstico & $4+15+100$ & 119 \\
+Resultado Diagnóstico & $4+4+4+20+200$ & 232 \\
+Procedimiento\_Aplicado & $4+4+4+200$ & 212 \\
+Insumo Utilizado & $4+4+4+4$ & 16 \\
+Receta Médica & $4+4+4+100+4$ & 116 \\
+Registro Estancia & $4+4+20+4+4+4+200$ & 240 \\
+Transporte\_Logística & $4+4+20+20+150$ & 198 \\
+Factura & $4+8+8+8+8+4+4+4$ & 48 \\
+Detalle Factura & $4+4+4+4+4+4+8+8$ & 40 \\
+Pago & $4+4+8+8+20$ & 44 \\
+\bottomrule
+\end{tabular}
+\caption{Estimación de la Base de Datos Longitud de atributos por registro}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Nombre de la tabla} & \textbf{Tamaño (Bytes)} & \textbf{Datos Estimados} & \textbf{Tamaño Total (Bytes)} \\
+\midrule
+Especie & 54 & 10 & 540 \\
+Raza & 58 & 200 & 11\,600 \\
+Enfermedad\_Diagnóstico & 119 & 500 & 59\,500 \\
+Item\_Catálogo & 132 & 300 & 39\,600 \\
+Servicio & 9 & 50 & 450 \\
+Artículo Petshop & 108 & 200 & 21\,600 \\
+Medicamento & 205 & 50 & 10\,250 \\
+\midrule
+Total & & 1\,310 & 143\,540 \\
+\bottomrule
+\end{tabular}
+\caption{Tamaño de las tablas fijas}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Nombre de la tabla} & \textbf{Tamaño (B)} & \textbf{Crec. diario} & \textbf{Crec. anual} & \textbf{Tamaño anual (B)} \\
+\midrule
+Persona & 227 & 10 & 3\,650 & 828\,550 \\
+Cliente & 254 & 8 & 2\,920 & 741\,480 \\
+Empleado & 36 & 1 & 365 & 13\,140 \\
+Veterinario & 69 & 1 & 365 & 25\,185 \\
+Personal\_Apoyo & 54 & 1 & 365 & 19\,710 \\
+Mascota & 67 & 12 & 4\,380 & 293\,460 \\
+Historial Médico & 236 & 12 & 4\,380 & 1\,033\,680 \\
+Lote\_Inventario & 20 & 5 & 1\,825 & 36\,500 \\
+Cita & 264 & 30 & 10\,950 & 2\,890\,800 \\
+Atención Clínica & 456 & 25 & 9\,125 & 4\,161\,000 \\
+Resultado Diagnóstico & 232 & 30 & 10\,950 & 2\,540\,400 \\
+Procedimiento\_Aplicado & 212 & 20 & 7\,300 & 1\,547\,600 \\
+Insumo Utilizado & 16 & 40 & 14\,600 & 233\,600 \\
+Receta Médica & 116 & 25 & 9\,125 & 1\,058\,500 \\
+Registro Estancia & 240 & 5 & 1\,825 & 438\,000 \\
+Transporte\_Logística & 198 & 8 & 2\,920 & 578\,160 \\
+Factura & 48 & 35 & 12\,775 & 613\,200 \\
+Detalle Factura & 40 & 100 & 36\,500 & 1\,460\,000 \\
+Pago & 44 & 40 & 14\,600 & 642\,400 \\
+\midrule
+Total & & & 148\,920 & 19\,155\,365 \\
+\bottomrule
+\end{tabular}
+\caption{Tamaño de las tablas cambiantes}
+\end{table}
+
+(*) Se está considerando que el crecimiento de los registros de nuevos clientes es lineal. Con base en las estimaciones anteriores, el tamaño total de la base de datos para el primer año de operación se calcula en aproximadamente 19.3 MB para las tablas cambiantes más 143.5 KB para las tablas fijas, lo que confirma la viabilidad del despliegue en una instancia estándar de PostgreSQL sin requerimientos especiales de almacenamiento.
+
+\section{Objetivos del proyecto}
+
+El presente proyecto persigue los siguientes objetivos técnicos y operativos, orientados a resolver de raíz la problemática de gestión de información de SOS Veterinaria:
+
+\begin{enumerate}
+	\item \textbf{Unificar el flujo clínico y comercial en una única base de datos normalizada.} Centralizar en un solo sistema transaccional todos los procesos de la clínica —médicos, farmacéuticos, logísticos y comerciales—, eliminando los silos de información actualmente gestionados con hojas de cálculo y registros físicos desconectados entre sí.
+	\item \textbf{Eliminar la redundancia de datos mediante el uso de claves primarias surrogadas.} Sustituir toda llave compuesta o natural por claves primarias surrogadas simples (enteros autoincrementales) en cada entidad del modelo, garantizando eficiencia en operaciones de JOIN y eliminación de la duplicidad de atributos comunes entre tablas relacionadas.
+	\item \textbf{Habilitar la trazabilidad completa del inventario farmacéutico.} Implementar un mecanismo que permita descontar el stock directamente del lote específico de un medicamento, tanto en el contexto de su uso en quirófano o consulta (\texttt{Insumo\_Utilizado}) como en su venta directa al cliente en el mostrador de la farmacia (\texttt{Detalle\_Factura}), cerrando el ciclo de inventario de forma auditable y sin intervención manual.
+\end{enumerate}
+
+\section{Referencias}
+
+\begin{itemize}
+	\item SOS Veterinaria. (s.f.). SOS Veterinaria. Recuperado el 21 de mayo de 2026, de \url{https://www.sosveterinaria.com}
+	\item SOS Veterinaria. (s.f.). Quiénes somos. Recuperado el 21 de mayo de 2026, de \url{https://www.sosveterinaria.com/pages/quienes-somos}
+	\item MiVet. (s.f.). SOS Veterinaria. Recuperado el 21 de mayo de 2026, de \url{https://mivet.net.pe/p/sos-veterinaria}
+	\item Veterinaria 24 Horas. (s.f.). SOS Veterinaria - Veterinaria 24 horas en Miraflores. Recuperado el 21 de mayo de 2026, de \url{https://x.veterinaria24hs.com/lima/miraflores/sos-veterinaria-veterinaria-24-horas-en-miraflores}
+	\item Mascotas365. (s.f.). SOS Veterinaria. Recuperado el 21 de mayo de 2026, de \url{https://mascotas365.com/establecimiento/sos-veterinaria}
+	\item Compuempresa. (s.f.). SOS Veterinaria E.I.R.L. / MAPEVAS S.A.C. Recuperado el 21 de mayo de 2026, de \url{https://compuempresa.com/info/sos-veterinaria-eirl-2CBF}
+	\item Todos Negocios. (s.f.). SOS Veterinaria. Recuperado el 21 de mayo de 2026, de \url{https://pe.todosnegocios.com/sos-veterinaria-01-4228024}
+	\item Ubicome. (s.f.). S.O.S Veterinaria. Recuperado el 21 de mayo de 2026, de \url{https://www.ubicome.pe/empresa/s-o-s-veterinaria-lima-28472}
+	\item Firmania Perú. (s.f.). SOS Veterinaria. Recuperado el 21 de mayo de 2026, de \url{https://firmania.com.pe/miraflores-lima/sos-veterinaria-38516}
+	\item Veterinarias Perú. (s.f.). Mejores veterinarias en Lima. Recuperado el 21 de mayo de 2026, de \url{https://veterinariasperu.net/mejores-veterinarias-lima}
+	\item Google Maps. (s.f.). SOS Veterinaria. Recuperado el 21 de mayo de 2026, de \url{https://maps.google.com}
+	\item SUNAT. (s.f.). Consulta RUC MAPEVAS S.A.C. Recuperado el 21 de mayo de 2026, de \url{https://e-consultaruc.sunat.gob.pe}
+	\item Colegio Médico Veterinario del Perú. (s.f.). Información institucional. Recuperado el 21 de mayo de 2026, de \url{https://www.cmvp.org.pe}
+	\item Ministerio de Desarrollo Agrario y Riego del Perú. (s.f.). Sanidad animal y bienestar animal. Recuperado el 21 de mayo de 2026, de \url{https://www.midagri.gob.pe}
+	\item World Small Animal Veterinary Association. (s.f.). Veterinary standards and animal care guidelines. Recuperado el 21 de mayo de 2026, de \url{https://wsava.org}
+	\item American Veterinary Medical Association. (s.f.). Veterinary medical resources. Recuperado el 21 de mayo de 2026, de \url{https://www.avma.org}
+\end{itemize}
+
+\section{Eventualidades}
+
+\subsection{Problemas}
+
+Durante el análisis y diseño del sistema se identificó la siguiente problemática de difícil resolución a nivel de base de datos:
+
+\textbf{Gestión de mermas de inventario.} El principal problema operativo no cubierto de forma trivial por el modelo es el control de las mermas, entendidas como la pérdida de unidades de inventario por causas distintas a la venta o al uso clínico documentado: productos dañados durante el almacenamiento, vencimientos no detectados a tiempo, roturas accidentales o, en el peor de los casos, sustracciones no autorizadas. Este tipo de discrepancia produce un descuadre entre el stock físico real en las repisas de la farmacia y el stock registrado en la base de datos, lo que invalida la confiabilidad de las consultas de inventario y puede derivar en decisiones de reabastecimiento incorrectas. Si bien el modelo contempla el campo \texttt{Stock\_Actual} en la entidad \texttt{Lote\_Inventario} como el valor autoritativo, cualquier merma no registrada generará una divergencia que solo será detectable mediante auditorías físicas periódicas. Se recomienda, como trabajo futuro, implementar un módulo de ajuste de inventario con registro de motivo y responsable del ajuste.
+
+\subsection{Límites}
+
+El alcance del presente proyecto se circunscribe estrictamente a la gestión operativa de la clínica veterinaria. En consecuencia, el sistema diseñado no modela ni pretende cubrir los siguientes dominios:
+
+\begin{itemize}
+	\item \textbf{Contabilidad interna de planillas:} El cálculo de sueldos, beneficios sociales, descuentos laborales o el registro de adelantos de remuneración del personal quedan fuera del alcance. El sistema registra el salario base del empleado únicamente como dato referencial en la entidad Empleado.
+	\item \textbf{Pago de servicios y gastos fijos:} Las obligaciones de la clínica con proveedores de servicios básicos (electricidad, agua, internet) o el pago de alquiler del local no forman parte del modelo transaccional diseñado.
+	\item \textbf{Obligaciones tributarias con SUNAT:} La declaración y liquidación de impuestos (IGV, Impuesto a la Renta) no es responsabilidad directa del sistema. Si bien el modelo calcula y almacena el IGV en cada factura emitida, la integración con los sistemas de recaudación de la Superintendencia Nacional de Aduanas y de Administración Tributaria queda fuera del presente alcance.
+\end{itemize}

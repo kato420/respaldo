@@ -1,0 +1,531 @@
+#!/usr/bin/env python3
+"""
+agy-sessions: Gestor interactivo de sesiones para Antigravity CLI (agy)
+Permite listar, renombrar, borrar y reanudar conversaciones fácilmente.
+"""
+
+import curses
+import datetime
+import glob
+import json
+import os
+import re
+import shutil
+import sqlite3
+import sys
+
+CLI_DIR = os.path.expanduser("~/.gemini/antigravity-cli")
+HISTORY_FILE = os.path.join(CLI_DIR, "history.jsonl")
+CONV_DIR = os.path.join(CLI_DIR, "conversations")
+BRAIN_DIR = os.path.join(CLI_DIR, "brain")
+NAMES_FILE = os.path.join(CLI_DIR, "session_names.json")
+SUMMARIES_DB = os.path.join(CLI_DIR, "conversation_summaries.db")
+
+
+def load_custom_names():
+    if os.path.exists(NAMES_FILE):
+        try:
+            with open(NAMES_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+
+def save_custom_name(cid, name):
+    names = load_custom_names()
+    name = name.strip()
+    if name:
+        names[cid] = name
+    else:
+        names.pop(cid, None)
+    os.makedirs(CLI_DIR, exist_ok=True)
+    with open(NAMES_FILE, "w", encoding="utf-8") as f:
+        json.dump(names, f, ensure_ascii=False, indent=2)
+
+
+def delete_session(cid):
+    """Elimina permanentemente una sesión y todos sus rastros."""
+    # 1. Quitar nombre personalizado
+    save_custom_name(cid, "")
+
+    # 2. Eliminar bases de datos asociadas en conversations/
+    if os.path.exists(CONV_DIR):
+        for p in glob.glob(os.path.join(CONV_DIR, f"{cid}*")):
+            try:
+                os.remove(p)
+            except Exception:
+                pass
+
+    # 3. Eliminar carpeta en brain/
+    b_dir = os.path.join(BRAIN_DIR, cid)
+    if os.path.exists(b_dir):
+        try:
+            shutil.rmtree(b_dir)
+        except Exception:
+            pass
+
+    # 4. Limpiar history.jsonl
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            new_lines = []
+            for l in lines:
+                try:
+                    d = json.loads(l)
+                    if d.get("conversationId") != cid:
+                        new_lines.append(l)
+                except Exception:
+                    new_lines.append(l)
+            with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+                f.writelines(new_lines)
+        except Exception:
+            pass
+
+    # 5. Limpiar conversation_summaries.db
+    if os.path.exists(SUMMARIES_DB):
+        try:
+            conn = sqlite3.connect(SUMMARIES_DB)
+            cur = conn.cursor()
+            cur.execute("DELETE FROM conversation_summaries WHERE conversation_id = ?", (cid,))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
+
+def get_all_sessions():
+    custom_names = load_custom_names()
+    sessions = {}
+
+    # 1. Desde history.jsonl
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                for line in f:
+                    try:
+                        d = json.loads(line)
+                        cid = d.get("conversationId")
+                        if cid:
+                            ts = d.get("timestamp", 0) / 1000.0
+                            msg = d.get("display", "").strip()
+                            msg = re.sub(r"<USER_REQUEST>|</USER_REQUEST>", "", msg).strip()
+                            msg = re.sub(r"\s+", " ", msg)
+                            ws = d.get("workspace", "")
+                            if cid not in sessions:
+                                sessions[cid] = {
+                                    "id": cid,
+                                    "timestamp": ts,
+                                    "preview": msg,
+                                    "workspace": ws,
+                                }
+                            else:
+                                if ts > sessions[cid]["timestamp"]:
+                                    sessions[cid]["timestamp"] = ts
+                                if msg and not sessions[cid]["preview"]:
+                                    sessions[cid]["preview"] = msg
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+    # 2. Desde logs de transcript.jsonl en brain
+    if os.path.exists(BRAIN_DIR):
+        try:
+            for cid in os.listdir(BRAIN_DIR):
+                tpath = os.path.join(BRAIN_DIR, cid, ".system_generated", "logs", "transcript.jsonl")
+                if os.path.exists(tpath):
+                    mtime = os.path.getmtime(tpath)
+                    if cid not in sessions:
+                        sessions[cid] = {
+                            "id": cid,
+                            "timestamp": mtime,
+                            "preview": "",
+                            "workspace": "",
+                        }
+                    if not sessions[cid].get("preview"):
+                        try:
+                            with open(tpath, "r", encoding="utf-8") as f:
+                                for line in f:
+                                    try:
+                                        obj = json.loads(line)
+                                        if obj.get("type") == "USER_INPUT":
+                                            raw = obj.get("content", "")
+                                            clean = re.sub(r"<USER_REQUEST>|</USER_REQUEST>", "", raw).strip()
+                                            clean = re.sub(r"\s+", " ", clean)
+                                            sessions[cid]["preview"] = clean
+                                            break
+                                    except Exception:
+                                        pass
+                        except Exception:
+                            pass
+        except Exception:
+            pass
+
+    # 3. Desde bases de datos en conversations/*.db
+    if os.path.exists(CONV_DIR):
+        try:
+            for fpath in glob.glob(os.path.join(CONV_DIR, "*.db")):
+                cid = os.path.splitext(os.path.basename(fpath))[0]
+                mtime = os.path.getmtime(fpath)
+                if cid not in sessions:
+                    sessions[cid] = {
+                        "id": cid,
+                        "timestamp": mtime,
+                        "preview": "(Sesión sin registro de texto)",
+                        "workspace": "",
+                    }
+                else:
+                    if mtime > sessions[cid]["timestamp"]:
+                        sessions[cid]["timestamp"] = mtime
+        except Exception:
+            pass
+
+    # Asignar nombres y ordenar
+    result = []
+    for s in sessions.values():
+        s["name"] = custom_names.get(s["id"], "")
+        if not s.get("preview"):
+            s["preview"] = "(Sin mensajes)"
+        result.append(s)
+
+    result.sort(key=lambda x: x["timestamp"], reverse=True)
+    return result
+
+
+def safe_addstr(win, y, x, text, attr=0):
+    try:
+        max_y, max_x = win.getmaxyx()
+        if y < 0 or y >= max_y or x < 0 or x >= max_x:
+            return
+        avail = max_x - x
+        if y == max_y - 1:
+            avail -= 1
+        if avail <= 0:
+            return
+        win.addstr(y, x, str(text)[:avail], attr)
+    except Exception:
+        pass
+
+
+def draw_box(stdscr, y, x, h, w, title=""):
+    safe_addstr(stdscr, y, x, "╭" + "─" * (w - 2) + "╮")
+    for row in range(1, h - 1):
+        safe_addstr(stdscr, y + row, x, "│" + " " * (w - 2) + "│")
+    safe_addstr(stdscr, y + h - 1, x, "╰" + "─" * (w - 2) + "╯")
+    if title:
+        t = f" {title} "[: w - 4]
+        safe_addstr(stdscr, y, x + 2, t, curses.A_BOLD)
+
+
+def prompt_rename(stdscr, cid, current_name):
+    max_y, max_x = stdscr.getmaxyx()
+    h = 8
+    w = min(68, max_x - 4)
+    y = max(1, (max_y - h) // 2)
+    x = max(1, (max_x - w) // 2)
+
+    modal = curses.newwin(h, w, y, x)
+    modal.keypad(True)
+    text = current_name
+
+    while True:
+        modal.erase()
+        safe_addstr(modal, 0, 0, "╭" + "─" * (w - 2) + "╮", curses.color_pair(3) | curses.A_BOLD)
+        for r in range(1, h - 1):
+            safe_addstr(modal, r, 0, "│" + " " * (w - 2) + "│", curses.color_pair(3))
+        safe_addstr(modal, h - 1, 0, "╰" + "─" * (w - 2) + "╯", curses.color_pair(3) | curses.A_BOLD)
+        safe_addstr(modal, 0, 2, " 🏷️  Renombrar Sesión ", curses.color_pair(3) | curses.A_BOLD)
+
+        safe_addstr(modal, 2, 3, f"ID: {cid[:30]}...", curses.A_DIM)
+        safe_addstr(modal, 3, 3, "Nombre: ", curses.A_BOLD)
+
+        input_w = max(10, w - 15)
+        display_text = text[-input_w:] if len(text) > input_w else text
+        safe_addstr(modal, 3, 11, "[" + display_text.ljust(input_w) + "]", curses.color_pair(2) | curses.A_BOLD)
+
+        safe_addstr(modal, 5, 3, "[Enter] Guardar   [Esc] Cancelar   [Ctrl+U] Borrar", curses.A_DIM)
+        modal.refresh()
+
+        try:
+            ch = modal.get_wch()
+        except Exception:
+            continue
+
+        if ch in ('\n', '\r', curses.KEY_ENTER, 10, 13):
+            return text.strip()
+        elif ch in ('\x1b', 27):
+            return None
+        elif ch in ('\x7f', '\x08', curses.KEY_BACKSPACE, 127, 8):
+            if text:
+                text = text[:-1]
+        elif ch in ('\x15', 21):
+            text = ""
+        elif isinstance(ch, str) and ch.isprintable():
+            if len(text) < 50:
+                text += ch
+
+
+def prompt_confirm_delete(stdscr, cid, name, preview):
+    max_y, max_x = stdscr.getmaxyx()
+    h = 9
+    w = min(68, max_x - 4)
+    y = max(1, (max_y - h) // 2)
+    x = max(1, (max_x - w) // 2)
+
+    modal = curses.newwin(h, w, y, x)
+    modal.keypad(True)
+
+    modal.erase()
+    safe_addstr(modal, 0, 0, "╭" + "─" * (w - 2) + "╮", curses.color_pair(3) | curses.A_BOLD)
+    for r in range(1, h - 1):
+        safe_addstr(modal, r, 0, "│" + " " * (w - 2) + "│", curses.color_pair(3))
+    safe_addstr(modal, h - 1, 0, "╰" + "─" * (w - 2) + "╯", curses.color_pair(3) | curses.A_BOLD)
+    safe_addstr(modal, 0, 2, " 🗑️  Eliminar Sesión ", curses.color_pair(3) | curses.A_BOLD)
+
+    display_name = name if name else preview[:35]
+    safe_addstr(modal, 2, 3, f"Sesión: {display_name}", curses.color_pair(2) | curses.A_BOLD)
+    safe_addstr(modal, 3, 3, f"ID: {cid}", curses.A_DIM)
+    safe_addstr(modal, 5, 3, "⚠️  ¿Eliminar permanentemente todos los datos de esta sesión?", curses.A_BOLD)
+    safe_addstr(modal, 6, 3, "[s / Enter] Sí, eliminar       [n / Esc] Cancelar", curses.color_pair(3) | curses.A_BOLD)
+    modal.refresh()
+
+    while True:
+        try:
+            ch = modal.get_wch()
+        except Exception:
+            continue
+
+        if ch in ('s', 'S', 'y', 'Y', '\n', '\r', curses.KEY_ENTER, 10, 13):
+            return True
+        elif ch in ('n', 'N', '\x1b', 27, 'q', 'Q'):
+            return False
+
+
+def main_tui(stdscr):
+    try:
+        curses.curs_set(0)
+    except Exception:
+        pass
+    stdscr.keypad(True)
+    curses.use_default_colors()
+
+    # Colores
+    if curses.has_colors():
+        curses.init_pair(1, curses.COLOR_CYAN, -1)     # Títulos / Bordes
+        curses.init_pair(2, curses.COLOR_GREEN, -1)    # Sesiones con nombre / Selección
+        curses.init_pair(3, curses.COLOR_YELLOW, -1)   # Destacados / Alertas
+        curses.init_pair(4, curses.COLOR_MAGENTA, -1)  # Fechas
+        curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_CYAN)  # Barra seleccionada
+        curses.init_pair(6, curses.COLOR_WHITE, -1)    # Normal
+
+    selected_idx = 0
+    filter_query = ""
+    is_filtering = False
+
+    while True:
+        all_sessions = get_all_sessions()
+
+        # Filtrar si hay búsqueda
+        if filter_query:
+            q = filter_query.lower()
+            sessions = [
+                s for s in all_sessions
+                if q in s["name"].lower()
+                or q in s["preview"].lower()
+                or q in s["id"].lower()
+            ]
+        else:
+            sessions = all_sessions
+
+        if not sessions and selected_idx > 0:
+            selected_idx = 0
+        elif sessions and selected_idx >= len(sessions):
+            selected_idx = max(0, len(sessions) - 1)
+
+        stdscr.erase()
+        max_y, max_x = stdscr.getmaxyx()
+
+        if max_y < 12 or max_x < 50:
+            safe_addstr(stdscr, 0, 0, "Terminal muy pequeña para agy-sessions.", curses.A_BOLD)
+            stdscr.refresh()
+            try:
+                ch = stdscr.get_wch()
+                if ch in ('q', 'Q', '\x1b', 27):
+                    return None
+            except Exception:
+                pass
+            continue
+
+        h = max_y - 2
+        w = max_x - 4
+        y = 1
+        x = 2
+
+        draw_box(stdscr, y, x, h, w, "🚀 Antigravity CLI (agy) - Gestor de Sesiones")
+
+        if is_filtering:
+            filter_bar = f" 🔍 Buscar: {filter_query}_ (Presiona Enter o Esc para terminar) "
+            safe_addstr(stdscr, y + 1, x + 3, filter_bar[: w - 6], curses.color_pair(3) | curses.A_BOLD)
+        else:
+            stats = f" Total: {len(all_sessions)} sesiones | Mostrando: {len(sessions)}"
+            safe_addstr(stdscr, y + 1, x + 3, stats, curses.A_DIM)
+
+        header_y = y + 2
+        date_w = 17
+        name_w = min(26, max(12, (w - date_w - 12) // 2))
+        desc_w = max(10, w - date_w - name_w - 12)
+
+        col_header = (
+            f"  {'FECHA':<{date_w}} "
+            f"│ {'NOMBRE / ALIAS':<{name_w}} "
+            f"│ {'MENSAJE / RESUMEN'}"
+        )
+        safe_addstr(stdscr, header_y, x + 2, col_header[: w - 4], curses.color_pair(1) | curses.A_BOLD)
+        safe_addstr(stdscr, header_y + 1, x + 2, "─" * (w - 4), curses.color_pair(1))
+
+        list_y_start = header_y + 2
+        visible_rows = max(1, h - 7)
+        scroll_offset = max(0, min(selected_idx - (visible_rows // 2), max(0, len(sessions) - visible_rows)))
+
+        for i in range(visible_rows):
+            item_idx = scroll_offset + i
+            row_y = list_y_start + i
+            if item_idx >= len(sessions):
+                break
+
+            s = sessions[item_idx]
+            is_selected = (item_idx == selected_idx)
+            dt_str = datetime.datetime.fromtimestamp(s["timestamp"]).strftime("%Y-%m-%d %H:%M")
+
+            if s["name"]:
+                name_str = f"🏷️ {s['name']}"
+            else:
+                name_str = "[Sin nombre]"
+
+            dt_display = dt_str[:date_w].ljust(date_w)
+            name_display = name_str[:name_w].ljust(name_w)
+            preview_display = s["preview"][:desc_w]
+
+            line_str = f" {dt_display} │ {name_display} │ {preview_display}"
+            line_str = line_str[: w - 6].ljust(w - 6)
+
+            if is_selected:
+                prefix = "❯"
+                attr = curses.color_pair(5) | curses.A_BOLD
+                safe_addstr(stdscr, row_y, x + 2, prefix, curses.color_pair(2) | curses.A_BOLD)
+                safe_addstr(stdscr, row_y, x + 4, line_str, attr)
+            else:
+                prefix = " "
+                safe_addstr(stdscr, row_y, x + 2, prefix)
+                if s["name"]:
+                    safe_addstr(stdscr, row_y, x + 4, f" {dt_display} │ ", curses.A_DIM)
+                    safe_addstr(stdscr, row_y, x + 4 + len(dt_display) + 4, name_display, curses.color_pair(2) | curses.A_BOLD)
+                    safe_addstr(stdscr, row_y, x + 4 + len(dt_display) + 4 + len(name_display), f" │ {preview_display}", curses.A_NORMAL)
+                else:
+                    safe_addstr(stdscr, row_y, x + 4, f" {dt_display} │ ", curses.A_DIM)
+                    safe_addstr(stdscr, row_y, x + 4 + len(dt_display) + 4, name_display, curses.color_pair(3))
+                    safe_addstr(stdscr, row_y, x + 4 + len(dt_display) + 4 + len(name_display), f" │ {preview_display}", curses.A_DIM)
+
+        footer_y = y + h - 2
+        safe_addstr(stdscr, footer_y - 1, x + 2, "─" * (w - 4), curses.color_pair(1))
+        footer_text = " [Enter] Abrir  [r] Renombrar  [d] Borrar  [c] Última  [n] Nueva  [/] Buscar  [q] Salir "
+        safe_addstr(stdscr, footer_y, x + 3, footer_text[: w - 6], curses.color_pair(3) | curses.A_BOLD)
+
+        stdscr.refresh()
+
+        try:
+            ch = stdscr.get_wch()
+        except Exception:
+            continue
+
+        if is_filtering:
+            if ch in ('\n', '\r', curses.KEY_ENTER, 10, 13, '\x1b', 27):
+                is_filtering = False
+            elif ch in ('\x7f', '\x08', curses.KEY_BACKSPACE, 127, 8):
+                filter_query = filter_query[:-1]
+            elif isinstance(ch, str) and ch.isprintable():
+                filter_query += ch
+            continue
+
+        if ch in ('q', 'Q', '\x1b', 27):
+            return None
+        elif ch in (curses.KEY_UP, 'k', 'K'):
+            if selected_idx > 0:
+                selected_idx -= 1
+        elif ch in (curses.KEY_DOWN, 'j', 'J'):
+            if selected_idx < len(sessions) - 1:
+                selected_idx += 1
+        elif ch == curses.KEY_PPAGE:
+            selected_idx = max(0, selected_idx - visible_rows)
+        elif ch == curses.KEY_NPAGE:
+            selected_idx = min(max(0, len(sessions) - 1), selected_idx + visible_rows)
+        elif ch in ('r', 'R', curses.KEY_F2):
+            if sessions:
+                cur_s = sessions[selected_idx]
+                new_name = prompt_rename(stdscr, cur_s["id"], cur_s["name"])
+                if new_name is not None:
+                    save_custom_name(cur_s["id"], new_name)
+        elif ch in ('d', 'D', 'x', 'X', curses.KEY_DC):
+            if sessions:
+                cur_s = sessions[selected_idx]
+                if prompt_confirm_delete(stdscr, cur_s["id"], cur_s["name"], cur_s["preview"]):
+                    delete_session(cur_s["id"])
+                    if selected_idx >= len(sessions) - 1 and selected_idx > 0:
+                        selected_idx -= 1
+        elif ch == '/':
+            is_filtering = True
+            filter_query = ""
+        elif ch in ('c', 'C'):
+            return ("continue", None)
+        elif ch in ('n', 'N'):
+            return ("new", None)
+        elif ch in ('\n', '\r', curses.KEY_ENTER, 10, 13):
+            if sessions:
+                chosen = sessions[selected_idx]
+                return ("resume", chosen["id"])
+
+
+def find_agy_bin():
+    local_bin = os.path.expanduser("~/.local/bin/agy")
+    gemini_bin = os.path.expanduser("~/.gemini/antigravity-cli/bin/agy")
+    for candidate in [local_bin, gemini_bin, "/usr/local/bin/agy", "/usr/bin/agy"]:
+        if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            return candidate
+    return shutil.which("agy") or "agy"
+
+
+def main():
+    # Asegurar que ~/.local/bin y rutas de antigravity estén en el PATH del proceso
+    local_dir = os.path.expanduser("~/.local/bin")
+    gemini_dir = os.path.expanduser("~/.gemini/antigravity-cli/bin")
+    current_path = os.environ.get("PATH", "")
+    for p in [local_dir, gemini_dir]:
+        if p not in current_path:
+            current_path = f"{p}:{current_path}"
+    os.environ["PATH"] = current_path
+
+    try:
+        action = curses.wrapper(main_tui)
+    except KeyboardInterrupt:
+        sys.exit(0)
+
+    if not action:
+        sys.exit(0)
+
+    agy_bin = find_agy_bin()
+    act_type, cid = action
+    if act_type == "resume" and cid:
+        print(f"\n🚀 Reanudando conversación: {cid}\n")
+        os.execvp(agy_bin, [agy_bin, "--conversation", cid])
+    elif act_type == "continue":
+        print("\n🚀 Continuando la conversación más reciente...\n")
+        os.execvp(agy_bin, [agy_bin, "-c"])
+    elif act_type == "new":
+        print("\n🚀 Iniciando nueva sesión con Antigravity...\n")
+        os.execvp(agy_bin, [agy_bin])
+
+
+if __name__ == "__main__":
+    main()

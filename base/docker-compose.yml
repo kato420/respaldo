@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: midatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - /home/utec/.local/share/nvim/dadbod_ui/tmp:/home/utec/.local/share/nvim/dadbod_ui/tmp
+      - /tmp:/tmp
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  # pgadmin_data:

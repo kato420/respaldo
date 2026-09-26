@@ -1,0 +1,58 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {chapter}{\numberline {1}Requisitos}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Introducción}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Descripción general de la empresa}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Necesidad / usos de la base de datos}{2}{section.1.3}%
+\contentsline {section}{\numberline {1.4}¿Cómo resuelve el problema hoy?}{3}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Cómo se almacenan y procesan los datos hoy}{3}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Flujo de datos}{3}{subsection.1.4.2}%
+\contentsline {section}{\numberline {1.5}Descripción detallada del sistema}{4}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}Objetos de información actuales}{4}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.5.2}Características esperadas}{5}{subsection.1.5.2}%
+\contentsline {subsection}{\numberline {1.5.3}Tipos de usuarios}{5}{subsection.1.5.3}%
+\contentsline {subsection}{\numberline {1.5.4}Tipos de consulta}{6}{subsection.1.5.4}%
+\contentsline {subsection}{\numberline {1.5.5}Tamaño estimado de la base de datos}{6}{subsection.1.5.5}%
+\contentsline {section}{\numberline {1.6}Objetivos del proyecto}{8}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Referencias}{9}{section.1.7}%
+\contentsline {section}{\numberline {1.8}Eventualidades}{10}{section.1.8}%
+\contentsline {subsection}{\numberline {1.8.1}Problemas}{10}{subsection.1.8.1}%
+\contentsline {subsection}{\numberline {1.8.2}Límites}{10}{subsection.1.8.2}%
+\contentsline {chapter}{\numberline {2}Modelo Entidad-Relación}{11}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Reglas semánticas}{11}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Modelo Entidad-Relación}{14}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Especificaciones y consideraciones del modelo}{15}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Persona}{15}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Cliente}{15}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Empleado}{15}{subsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.3.4}Veterinario}{15}{subsection.2.3.4}%
+\contentsline {subsection}{\numberline {2.3.5}Personal\_Apoyo}{16}{subsection.2.3.5}%
+\contentsline {subsection}{\numberline {2.3.6}Especie}{16}{subsection.2.3.6}%
+\contentsline {subsection}{\numberline {2.3.7}Raza}{16}{subsection.2.3.7}%
+\contentsline {subsection}{\numberline {2.3.8}Mascota}{16}{subsection.2.3.8}%
+\contentsline {subsection}{\numberline {2.3.9}Historial Médico}{17}{subsection.2.3.9}%
+\contentsline {subsection}{\numberline {2.3.10}Item\_Catálogo}{17}{subsection.2.3.10}%
+\contentsline {subsection}{\numberline {2.3.11}Servicio}{17}{subsection.2.3.11}%
+\contentsline {subsection}{\numberline {2.3.12}Artículo\_Petshop}{17}{subsection.2.3.12}%
+\contentsline {subsection}{\numberline {2.3.13}Medicamento}{17}{subsection.2.3.13}%
+\contentsline {subsection}{\numberline {2.3.14}Lote\_Inventario}{18}{subsection.2.3.14}%
+\contentsline {subsection}{\numberline {2.3.15}Cita}{18}{subsection.2.3.15}%
+\contentsline {subsection}{\numberline {2.3.16}Atención Clínica}{18}{subsection.2.3.16}%
+\contentsline {subsection}{\numberline {2.3.17}Enfermedad\_Diagnóstico}{18}{subsection.2.3.17}%
+\contentsline {subsection}{\numberline {2.3.18}Resultado\_Diagnóstico}{19}{subsection.2.3.18}%
+\contentsline {subsection}{\numberline {2.3.19}Procedimiento\_Aplicado}{19}{subsection.2.3.19}%
+\contentsline {subsection}{\numberline {2.3.20}Insumo Utilizado}{19}{subsection.2.3.20}%
+\contentsline {subsection}{\numberline {2.3.21}Receta Médica}{19}{subsection.2.3.21}%
+\contentsline {subsection}{\numberline {2.3.22}Registro\_Estancia}{20}{subsection.2.3.22}%
+\contentsline {subsection}{\numberline {2.3.23}Transporte\_Logística}{20}{subsection.2.3.23}%
+\contentsline {subsection}{\numberline {2.3.24}Factura}{20}{subsection.2.3.24}%
+\contentsline {subsection}{\numberline {2.3.25}Detalle Factura}{20}{subsection.2.3.25}%
+\contentsline {subsection}{\numberline {2.3.26}Pago}{20}{subsection.2.3.26}%
+\contentsline {chapter}{\numberline {3}Modelo Relacional}{22}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Modelo Relacional}{22}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Especificaciones de transformación}{25}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Entidades}{25}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Entidades débiles}{26}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Entidades superclase / subclases}{27}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Relaciones binarias}{27}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}Relaciones ternarias}{28}{subsection.3.2.5}%
+\contentsline {section}{\numberline {3.3}Diccionario de datos}{28}{section.3.3}%

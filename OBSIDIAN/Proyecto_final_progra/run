@@ -1,0 +1,12 @@
+#!/bin/bash
+# Compilar con Ninja y ejecutar el binario
+
+# Si no existe la carpeta build, configuramos CMake primero
+if [ ! -d "build" ]; then
+    echo "Carpeta build no encontrada. Configurando CMake..."
+    cmake -B build -G Ninja
+fi
+
+ninja -C build
+echo "----------------------------------------"
+./build/Proyecto_final_progra

@@ -1,0 +1,164 @@
+/* ==========================================================================
+   WhiteSur GTK Theme Integration for Obsidian
+   Generado a partir de los colores de ~/.themes/WhiteSur-Dark-solid
+   ========================================================================== */
+
+.theme-dark {
+  /* WhiteSur-Dark GTK Base Palette */
+  --color-base-00: #242424; /* theme_base_color: fondo principal del editor */
+  --color-base-10: #2a2a2a;
+  --color-base-20: #333333; /* theme_bg_color: fondo de paneles laterales y cabeceras */
+  --color-base-25: #383838;
+  --color-base-30: #404040;
+  --color-base-35: #4a4a4a;
+  --color-base-40: #555555;
+  --color-base-50: #707070;
+  --color-base-60: #8c8c8c;
+  --color-base-70: #a6a6a6;
+  --color-base-100: #dedede; /* theme_fg_color: texto normal */
+
+  /* Obsidian UI Colors */
+  --background-primary: #242424;
+  --background-primary-alt: #1f1f1f;
+  --background-secondary: #333333;
+  --background-secondary-alt: #2b2b2b;
+  --background-modifier-hover: rgba(255, 255, 255, 0.06);
+  --background-modifier-active-hover: rgba(255, 255, 255, 0.1);
+
+  /* Texto y enlaces */
+  --text-normal: #dedede;
+  --text-muted: #a0a0a0;
+  --text-faint: #6e6e6e;
+  --link-color: #3484e2;
+  --link-color-hover: #5ba3f5;
+
+  /* WhiteSur Accent Color: Apple Blue (#0860F2) */
+  --color-accent: #0860F2;
+  --color-accent-1: #1d72f5;
+  --color-accent-2: #3484e2;
+  --interactive-accent: #0860F2;
+  --interactive-accent-hover: #1d72f5;
+  --text-accent: #0860F2;
+  --text-accent-hover: #3484e2;
+  --text-selection: rgba(8, 96, 242, 0.35);
+
+  /* Bordes y divisores al estilo WhiteSur */
+  --border-color: rgba(255, 255, 255, 0.12);
+  --background-modifier-border: rgba(255, 255, 255, 0.12);
+  --background-modifier-border-focus: #0860F2;
+  --background-modifier-border-hover: rgba(255, 255, 255, 0.22);
+  --divider-color: rgba(255, 255, 255, 0.12);
+
+  /* Barra de título y pestañas */
+  --titlebar-background: #333333;
+  --titlebar-background-focused: #333333;
+  --tab-background-active: #242424;
+  --tab-text-color-focused-active: #ffffff;
+  --tab-background-inactive: #333333;
+  --tab-outline-color: rgba(255, 255, 255, 0.12);
+
+  /* Elementos de navegación activos */
+  --nav-item-background-active: #0860F2;
+  --nav-item-color-active: #ffffff;
+
+  /* Botones e inputs */
+  --interactive-normal: #383838;
+  --interactive-hover: #444444;
+
+  /* Notificaciones y estados */
+  --color-red: #ED5F5D;
+  --color-orange: #E9873A;
+  --color-green: #79B757;
+  --color-blue: #0860F2;
+
+  /* Radios de borde redondeados estilo WhiteSur / macOS */
+  --radius-s: 5px;
+  --radius-m: 8px;
+  --radius-l: 12px;
+}
+
+/* Modo claro (WhiteSur Light si el sistema cambia a claro) */
+.theme-light {
+  --color-accent: #0860F2;
+  --interactive-accent: #0860F2;
+  --text-accent: #0860F2;
+  --link-color: #0860F2;
+  --nav-item-background-active: #0860F2;
+  --nav-item-color-active: #ffffff;
+}
+
+/* Ajustes de apariencia GTK / WhiteSur */
+.workspace-leaf-header,
+.workspace-tabs .tab-container {
+  background-color: var(--background-secondary);
+}
+
+.nav-file-title.is-active,
+.nav-folder-title.is-active {
+  border-radius: var(--radius-s);
+}
+
+/* Scrollbars finos y redondeados estilo GTK */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ==========================================================================
+   Controles de ventana tipo macOS/WhiteSur (Traffic Lights)
+   en caso de usar el marco integrado de Obsidian
+   ========================================================================== */
+.mod-linux .titlebar-button-container.mod-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 14px;
+}
+
+.mod-linux .titlebar-button {
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px !important;
+  min-height: 12px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  margin: auto 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: filter 0.15s ease;
+}
+
+.mod-linux .titlebar-button svg {
+  display: none !important;
+}
+
+.mod-linux .titlebar-button.mod-minimize {
+  background-color: #fdbc40 !important;
+  border: 1px solid #d89e24 !important;
+}
+
+.mod-linux .titlebar-button.mod-maximize {
+  background-color: #34c749 !important;
+  border: 1px solid #239e33 !important;
+}
+
+.mod-linux .titlebar-button.mod-close {
+  background-color: #fc5753 !important;
+  border: 1px solid #d43b37 !important;
+}
+
+.mod-linux .titlebar-button:hover {
+  filter: brightness(0.85);
+}
+

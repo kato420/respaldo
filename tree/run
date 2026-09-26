@@ -1,0 +1,5 @@
+#!/bin/bash
+# Compilar con Ninja y ejecutar el binario
+ninja -C build
+echo "----------------------------------------"
+./build/tree

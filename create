@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Salir si no se le pasa el nombre del proyecto
+if [ -z "$1" ]; then
+  echo "Uso: ./create.sh <nombre_del_proyecto>"
+  exit 1
+fi
+
+PROJECT_NAME=$1
+
+# Crear la estructura de carpetas
+mkdir -p "$PROJECT_NAME/build"
+mkdir -p "$PROJECT_NAME/src"
+
+# Generar el CMakeLists.txt
+cat <<EOF >"$PROJECT_NAME/CMakeLists.txt"
+cmake_minimum_required(VERSION 3.20)
+project($PROJECT_NAME)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Genera compile_commands.json para tu LSP en Neovim
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) 
+
+add_executable(\${PROJECT_NAME} src/main.cpp)
+EOF
+
+# Generar un main.cpp base
+cat <<EOF >"$PROJECT_NAME/src/main.cpp"
+#include <iostream>
+
+int main() {
+    std::cout << "Hola desde $PROJECT_NAME!" << std::endl;
+    return 0;
+}
+EOF
+
+# Generar el script ./run
+cat <<EOF >"$PROJECT_NAME/run"
+#!/bin/bash
+# Compilar con Ninja y ejecutar el binario
+ninja -C build
+echo "----------------------------------------"
+./build/$PROJECT_NAME
+EOF
+
+# Dar permisos de ejecución al script run
+chmod +x "$PROJECT_NAME/run"
+
+# Hacer el primer paso de configuración con Ninja automáticamente
+cd "$PROJECT_NAME" || exit
+cmake -G Ninja -S . -B build
+
+echo "✅ Proyecto $PROJECT_NAME creado y configurado."
+echo "Para compilar y probar, solo entra a la carpeta y ejecuta:"
+echo "  ./run"

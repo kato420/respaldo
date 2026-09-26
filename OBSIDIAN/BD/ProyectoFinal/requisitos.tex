@@ -1,0 +1,203 @@
+\chapter{Requisitos}
+
+\section{Introducción}
+
+En la última década, el sector aeroespacial comercial ha experimentado una transformación sin precedentes. La proliferación de megaconstelaciones en la Órbita Terrestre Baja (LEO) —impulsada por operadores privados como SpaceX, OneWeb y Amazon— ha desplazado el paradigma del satélite individual hacia el despliegue masivo de cientos o miles de dispositivos coordinados en enjambres. SpaceTech es un operador satelital global que gestiona múltiples constelaciones de satélites con propósitos que van desde las telecomunicaciones de banda ancha hasta la observación terrestre y la ciencia atmosférica. Este crecimiento exponencial, sin embargo, conlleva una consecuencia inevitable: la densificación del entorno orbital y el aumento proporcional del riesgo de colisión con los más de 35.000 fragmentos de basura espacial catalogados actualmente por la ESA y la NASA. En este contexto, la gestión eficiente de la información orbital —telemetría de los activos, trazado de objetos peligrosos y respuesta coordinada ante eventos de conjunción— deja de ser una ventaja competitiva y se convierte en un requisito crítico de seguridad. El presente proyecto propone el diseño e implementación de una base de datos relacional en PostgreSQL que centralice toda la información operativa de SpaceTech, desde los parámetros orbitales de cada constelación hasta el registro histórico de cada maniobra evasiva ejecutada por los operadores de vuelo.
+
+\section{Descripción general de la empresa}
+
+SpaceTech opera como un operador satelital global con presencia en cuatro continentes mediante una red de estaciones terrenas propias. Su estructura interna está organizada en cuatro áreas funcionales principales:
+
+\begin{itemize}
+    \item \textbf{Control de Vuelo:} Ingenieros de vuelo que monitorean en tiempo real los parámetros de salud de cada satélite (telemetría: voltaje, temperatura, carga de batería, altitud real) y emiten comandos de ajuste orbital o modo de seguridad cuando los límites operativos son superados.
+    \item \textbf{Operaciones Terrestres:} Operadores que coordinan la agenda de ventanas de contacto (pasos) de los satélites sobre las estaciones terrenas, garantizando la descarga oportuna de la telemetría almacenada en el satélite durante los periodos sin cobertura.
+    \item \textbf{Seguridad y Vigilancia Orbital:} Analistas que procesan los datos de radar provenientes de agencias externas (ESA, NASA, 18th SDS) y los cruzan con las trayectorias de los satélites propios para detectar, evaluar y gestionar eventos de conjunción de alto riesgo.
+    \item \textbf{Administración de Misiones:} Responsables de dar de alta nuevas misiones y constelaciones, gestionar los convenios con agencias propietarias externas y mantener el catálogo vigente de objetos espaciales rastreados por SpaceTech.
+\end{itemize}
+
+\section{Necesidad / usos de la base de datos}
+
+La coexistencia de múltiples constelaciones, decenas de estaciones terrenas y un flujo continuo de alertas de conjunción genera una demanda de información transversal que los sistemas actuales de SpaceTech son incapaces de satisfacer. La base de datos es indispensable para resolver los siguientes requerimientos operativos:
+
+\begin{itemize}
+    \item \textbf{Almacenamiento masivo de telemetría:} Recibir, procesar y almacenar de forma estructurada los signos vitales emitidos por cada satélite (batería, temperatura, voltaje, altitud real, posición geográfica), manteniendo la coherencia cronológica de los eventos incluso ante la llegada retardada de paquetes acumulados.
+    \item \textbf{Gestión de conjunciones y colisiones:} Cruzar constantemente las trayectorias de los satélites activos con el catálogo de basura espacial rastreada, permitiendo alertar automáticamente al equipo de seguridad ante acercamientos peligrosos con probabilidad y distancia mínima calculadas.
+    \item \textbf{Trazabilidad de comunicaciones:} Registrar con exactitud cada ventana de contacto entre una estación terrena y un satélite, evaluando la calidad de señal, el volumen de datos transferidos y la duración de cada sesión.
+    \item \textbf{Registro de maniobras evasivas:} Documentar de forma auditable cada maniobra evasiva ejecutada en respuesta a un evento de conjunción, vinculando el evento con el operador responsable de la autorización y el resultado operativo obtenido.
+\end{itemize}
+
+\section{¿Cómo resuelve el problema hoy?}
+
+\subsection{Cómo se almacenan y procesan los datos hoy}
+
+Actualmente, SpaceTech sufre de un ecosistema de datos altamente fragmentado. Cada estación terrena guarda la telemetría recibida en archivos de texto plano (CSV) en servidores locales, que se sincronizan en lotes al final del día mediante transferencias FTP programadas. La División de Seguridad Orbital mantiene el catálogo de basura espacial en hojas de cálculo compartidas de Excel, actualizadas manualmente con base en reportes recibidos por correo electrónico desde agencias de vigilancia espacial externas. El registro de maniobras evasivas se mantiene en documentos de Word archivados por fecha. No existe ninguna base de datos central que integre la telemetría en tiempo real con el catálogo de amenazas y el historial de maniobras.
+
+\subsection{Flujo de datos}
+
+El flujo de datos actual es predominantemente manual, secuencial y propenso a la pérdida de trazabilidad. A continuación se describe el ciclo típico ante un evento de conjunción:
+
+\begin{enumerate}
+    \item La agencia externa (ESA) envía un reporte de conjunción por correo electrónico al analista de turno.
+    \item El analista actualiza manualmente la hoja de Excel del catálogo de basura espacial.
+    \item El analista verifica a mano en otro sistema si el satélite involucrado está activo y cuál es su trayectoria prevista.
+    \item Si el riesgo supera el umbral, el analista notifica por teléfono o mensaje de chat al ingeniero de vuelo.
+    \item El ingeniero evalúa la telemetría del satélite en un sistema separado y decide si ejecutar una maniobra.
+    \item La maniobra se documenta en un archivo de Word sin vinculación formal con el evento de conjunción que la originó.
+\end{enumerate}
+
+Este flujo produce una pérdida sistemática de trazabilidad: al final del proceso es imposible determinar con certeza, desde los registros, qué operador autorizó qué maniobra en respuesta a qué evento específico, información crítica tanto para auditorías de seguridad como para la mejora continua de los protocolos.
+
+\section{Descripción detallada del sistema}
+
+\subsection{Objetos de información actuales}
+
+La migración integrará los siguientes objetos que hoy operan como silos de información desconectados:
+\begin{itemize}
+    \item Archivos CSV de telemetría cruda generados por las antenas de cada estación terrena.
+    \item Hojas de cálculo Excel con el catálogo de basura espacial y su seguimiento de trayectorias.
+    \item Bitácoras en papel o documentos digitales aislados que registran los horarios de ventanas de contacto entre estaciones y satélites.
+    \item Documentos de Word con el historial de maniobras evasivas ejecutadas, sin vinculación con los eventos de conjunción que las originaron.
+    \item Registros de personal operativo (operadores e ingenieros) en sistemas de RRHH desconectados del sistema operativo.
+\end{itemize}
+
+\subsection{Características y funcionalidades esperadas}
+
+El sistema de base de datos a implementar deberá cumplir con las siguientes características técnicas y funcionales:
+
+\begin{itemize}
+    \item \textbf{Alta disponibilidad:} El sistema debe soportar inserciones masivas de telemetría sin bloquear lecturas críticas del módulo de seguridad orbital, dado que SpaceTech opera bajo monitoreo continuo las 24 horas.
+    \item \textbf{Integridad referencial mediante llaves surrogadas:} Todas las entidades utilizarán claves primarias surrogadas simples (enteros autoincrementales) en lugar de llaves compuestas o naturales, garantizando eficiencia en operaciones de JOIN y unicidad garantizada por el SGBD.
+    \item \textbf{Herencia de entidades mediante patrón JOINED:} La jerarquía \texttt{Objeto\_Espacial} $\rightarrow$ \texttt{Satelite} / \texttt{Basura\_Espacial} se implementará con el patrón Table Per Subclass (JOINED), tal como lo describe Ramakrishnan en el capítulo de mapeo de modelos ER a relacional.
+    \item \textbf{Soporte para consultas analíticas de alto volumen:} La tabla \texttt{Telemetria} recibirá millones de registros diarios. Se implementarán índices B-Tree sobre \texttt{(ID\_Satelite, Timestamp\_Lectura)} y se considerará el particionamiento por rango de fecha para garantizar el rendimiento de consultas temporales.
+    \item \textbf{Trazabilidad de maniobras:} El modelo debe permitir reconstruir, desde cualquier maniobra evasiva, la cadena completa: evento de conjunción $\rightarrow$ satélite y objeto amenazante $\rightarrow$ operador responsable $\rightarrow$ resultado.
+\end{itemize}
+
+\subsection{Tipos de usuarios existentes/necesarios}
+
+El sistema contempla cuatro perfiles de usuario con distintos niveles de acceso y responsabilidad operativa:
+
+\begin{enumerate}
+    \item \textbf{Administrador de Misiones:} Acceso total al sistema. Puede dar de alta y baja satélites, constelaciones, agencias y estaciones terrenas. Gestiona el catálogo de operadores y sus roles. Genera reportes consolidados de flota.
+    \item \textbf{Ingeniero de Vuelo:} Acceso al módulo de telemetría y estado de satélites. Puede consultar en tiempo real los signos vitales de los activos bajo su responsabilidad y emitir comandos de ajuste registrados en el sistema.
+    \item \textbf{Operador de Estación Terrena:} Acceso al módulo de contactos y comunicaciones. Puede registrar y consultar las ventanas de contacto planificadas y ejecutadas entre estaciones y satélites.
+    \item \textbf{Analista de Seguridad Orbital:} Acceso al módulo de seguridad. Puede registrar y consultar el catálogo de basura espacial, gestionar los eventos de conjunción y autorizar maniobras evasivas, cuya aprobación queda registrada junto a su identidad como operador.
+\end{enumerate}
+
+\subsection{Tipos de consulta}
+
+El sistema deberá ser capaz de responder, de forma eficiente, a las siguientes consultas analíticas representativas:
+
+\begin{description}
+    \item[\textbf{Q1} Alerta Inminente:] ¿Cuáles son los 5 satélites activos con mayor probabilidad de impacto contra basura espacial en las próximas 24 horas, agrupados por agencia propietaria?
+    \item[\textbf{Q2} Rendimiento Energético:] ¿Cuál ha sido el promedio semanal de carga de batería y voltaje de cada satélite de la Constelación X durante el último mes?
+    \item[\textbf{Q3} Saturación de Estaciones:] ¿Qué estaciones terrenas establecieron más de 500 contactos durante los últimos 7 días y cuál fue el promedio de calidad de señal y volumen de datos transferidos por sesión?
+    \item[\textbf{Q4} Eficacia de Maniobras:] ¿Qué operadores autorizaron maniobras evasivas el último semestre, cuántas resultaron exitosas y cuál fue el delta-V promedio empleado por tipo de maniobra?
+\end{description}
+
+\subsection{Tamaño estimado de la base de datos}
+
+A continuación se presenta la estimación del tamaño de la base de datos considerando los tipos de datos reales de PostgreSQL para cada atributo. Los cálculos se basan en los tamaños estándar: $INT=4$ bytes, $BIGINT/TIMESTAMP=8$ bytes, $DECIMAL=8$ bytes, $BOOLEAN=1$ byte, $DATE=4$ bytes, $VARCHAR(n)=n$ bytes (promedio estimado).
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lcc}
+\toprule
+\textbf{Nombre de la tabla} & \textbf{Longitud de atributos en Bytes} & \textbf{Longitud del registro (Bytes)} \\
+\midrule
+Agencia & $4+100+50+20+4+100$ & 278 \\
+Constelacion & $4+4+100+200+4$ & 312 \\
+Operador & $4+100+100+20+4$ & 228 \\
+Orbita & $4+10+8+8+8+8$ & 46 \\
+Objeto\_Espacial & $4+20+8+8+15$ & 55 \\
+Satelite & $4+4+4+20+8+4+4$ & 48 \\
+Basura\_Espacial & $4+200+8+20+50$ & 282 \\
+Estacion\_Terrena & $4+4+100+50+8+8+8$ & 182 \\
+Contacto\_Estacion & $4+4+4+8+8+8+8$ & 44 \\
+Telemetria & $8+4+8+8+8+8+8+8+8$ & 68 \\
+Evento\_Colision & $4+4+4+8+8+8+25$ & 61 \\
+Maniobra\_Evasiva & $4+4+4+30+8+8+20$ & 78 \\
+\bottomrule
+\end{tabular}
+\caption{Estimación de la Base de Datos: Longitud de atributos por registro}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Nombre de la tabla} & \textbf{Tamaño (Bytes)} & \textbf{Datos Estimados} & \textbf{Tamaño Total (Bytes)} \\
+\midrule
+Agencia & 278 & 15 & 4\,170 \\
+Constelacion & 312 & 50 & 15\,600 \\
+Operador & 228 & 120 & 27\,360 \\
+Orbita & 46 & 30 & 1\,380 \\
+Objeto\_Espacial & 55 & 1\,200 & 66\,000 \\
+Estacion\_Terrena & 182 & 40 & 7\,280 \\
+\midrule
+Total & & 1\,455 & 121\,790 \\
+\bottomrule
+\end{tabular}
+\caption{Tamaño de las tablas fijas (Baja volatilidad)}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Nombre de la tabla} & \textbf{Tamaño (B)} & \textbf{Crec. diario} & \textbf{Crec. anual} & \textbf{Tamaño anual (B)} \\
+\midrule
+Satelite & 48 & 2 & 730 & 35\,040 \\
+Basura\_Espacial & 282 & 15 & 5\,475 & 1\,544\,150 \\
+Contacto\_Estacion & 44 & 4\,000 & 1\,460\,000 & 64\,240\,000 \\
+Telemetria & 68 & 1\,440\,000 & 525\,600\,000 & 35\,740\,800\,000 \\
+Evento\_Colision & 61 & 20 & 7\,300 & 445\,300 \\
+Maniobra\_Evasiva & 78 & 5 & 1\,825 & 142\,350 \\
+\midrule
+Total & & & 527\,075\,330 & 35\,807\,206\,840 \\
+\bottomrule
+\end{tabular}
+\caption{Tamaño de las tablas cambiantes (Alta transaccionalidad)}
+\end{table}
+
+(*) Se asume una constelación de 1000 satélites enviando un registro de telemetría por minuto ($1000 \times 1440 = 1{,}440{,}000$ registros diarios). Considerando los 9 atributos de la tabla \texttt{Telemetria} (BIGINT + INT + 7 campos DECIMAL/TIMESTAMP), el tamaño real por registro asciende a 68 bytes, elevando la proyección anual a aproximadamente \textbf{35.8 GB}, dominados por la tabla Telemetría. Esta proyección justifica plenamente el uso de índices B-Tree compuestos sobre \texttt{(ID\_Satelite, Timestamp\_Lectura)} y el particionamiento por rango de tiempo en PostgreSQL.
+
+\section{Objetivos del proyecto}
+
+El presente proyecto persigue los siguientes objetivos técnicos y operativos:
+
+\begin{enumerate}
+    \item \textbf{Centralizar el flujo operativo en una única base de datos normalizada:} Eliminar los silos de información (CSVs, Excels, documentos Word) unificando telemetría, catálogo orbital, registro de comunicaciones y gestión de maniobras en un único esquema relacional en PostgreSQL.
+    \item \textbf{Implementar herencia de entidades con el patrón JOINED:} Modelar la jerarquía \texttt{Objeto\_Espacial} $\rightarrow$ \{\texttt{Satelite}, \texttt{Basura\_Espacial}\} siguiendo la metodología descrita por Ramakrishnan \& Gehrke, garantizando la integridad referencial y la eliminación de redundancias en los atributos comunes a ambos tipos de objeto orbital.
+    \item \textbf{Garantizar la trazabilidad completa de eventos de seguridad:} Implementar el ciclo completo: detección de conjunción $\rightarrow$ alerta registrada $\rightarrow$ autorización de maniobra $\rightarrow$ resultado documentado, vinculando a cada paso el operador responsable mediante llaves foráneas auditables.
+\end{enumerate}
+
+\section{Referencias del proyecto}
+
+\begin{itemize}
+    \item Ramakrishnan, R., \& Gehrke, J. (2003). \textit{Database Management Systems} (3rd ed.). McGraw-Hill.
+    \item ESA Space Debris Office. (s.f.). \textit{Space Debris by the Numbers}. Recuperado de \url{https://www.esa.int/Space\_Safety/Space\_Debris}
+    \item NASA Orbital Debris Program Office. (s.f.). \textit{Orbital Debris Quarterly News}. Recuperado de \url{https://orbitaldebris.jsc.nasa.gov}
+    \item 18th Space Defense Squadron. (s.f.). \textit{Conjunction Data Messages}. Space-Track.org. Recuperado de \url{https://www.space-track.org}
+    \item SpaceX. (s.f.). \textit{Starlink Constellation Operations}. Recuperado de \url{https://www.spacex.com/starlink}
+\end{itemize}
+
+\section{Eventualidades}
+
+\subsection{Problemas que pudieran encontrarse en el proyecto}
+
+\textbf{Pérdida de paquetes y zonas muertas de señal:} En la órbita LEO, los satélites atraviesan periodos de hasta 40 minutos sin cobertura de ninguna estación terrena. Durante estos intervalos, la telemetría se almacena a bordo del satélite y se descarga en bloque al restablecer el contacto, con timestamps que corresponden al pasado. Esto genera en la base de datos un patrón de inserciones masivas con marcas de tiempo discontinuas, lo que puede distorsionar los cálculos de promedios temporales si no se diseñan las consultas con esta consideración.
+
+\textbf{Ambigüedad en la identificación de basura espacial:} Los fragmentos de pequeño tamaño ($<10$ cm) no son rastreables individualmente por los radares actuales, por lo que su catalogación como \texttt{Basura\_Espacial} puede ser imprecisa o provisional. Los registros de origen y tamaño estimado deberán admitir valores nullable en aquellos campos que dependan de una detección confirmada.
+
+\subsection{Límites y alcances del proyecto}
+
+El alcance del presente proyecto se circunscribe estrictamente a la gestión operativa del control de vuelo y la seguridad orbital de SpaceTech. En consecuencia, el sistema diseñado no modela ni pretende cubrir los siguientes dominios:
+
+\begin{itemize}
+    \item \textbf{Carga útil (Payload) excluida:} El modelo no almacenará el contenido de los datos científicos o comerciales que el satélite transmite para sus clientes finales (imágenes de alta resolución, tráfico de internet, datos sísmicos). Estos datos son procesados por sistemas externos de mayor escala.
+    \item \textbf{Gestión administrativa y financiera excluida:} No se modelarán tablas de contratos con clientes, facturación por servicios satelitales, pago de planillas de operadores ni obligaciones tributarias de la corporación.
+    \item \textbf{Simulación de trayectorias excluida:} El cálculo matemático de las trayectorias y la predicción de conjunciones (propagadores orbitales como SGP4) queda fuera del alcance de la base de datos. El sistema únicamente almacenará los resultados ya calculados por los sistemas externos.
+\end{itemize}

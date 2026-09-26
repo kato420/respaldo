@@ -1,0 +1,438 @@
+\chapter{Modelo Relacional}
+
+\section{Modelo Relacional}
+
+A continuación se presentan los esquemas relacionales finales del sistema. Las llaves primarias se indican subrayadas, las llaves foráneas con la etiqueta (FK) y las llaves únicas alternativas con (UK).
+
+Nota sobre las relaciones: El modelo implementa una jerarquía de herencia con el patrón Table Per Subclass (JOINED) para \texttt{Objeto\_Espacial} $\rightarrow$ \{\texttt{Satelite}, \texttt{Basura\_Espacial}\}. Las relaciones N:M entre \texttt{Satelite}--\texttt{Estacion\_Terrena} y \texttt{Satelite}--\texttt{Basura\_Espacial} se resuelven con entidades fuertes propias (\texttt{Contacto\_Estacion} y \texttt{Evento\_Colision}). La relación 1:1 entre \texttt{Evento\_Colision} y \texttt{Maniobra\_Evasiva} se implementa mediante un UNIQUE sobre la FK en el lado dependiente.
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 1: Organización y Misión}
+
+\begin{itemize}
+    \item Agencia (\underline{ID\_Agencia}, Nombre (UK), Pais, Tipo, Año\_Fundacion, Sitio\_Web)
+    \item Constelacion (\underline{ID\_Constelacion}, ID\_Agencia (FK), Nombre\_Mision, Proposito, Fecha\_Inicio)
+    \item Operador (\underline{ID\_Operador}, Nombre, Correo (UK), Rol, Fecha\_Contratacion)
+\end{itemize}
+
+Relaciones absorbidas como FK:
+\begin{itemize}
+    \item Agencia $\rightarrow$ Constelacion Gestiona (1:N): ID\_Agencia como FK en Constelacion.
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 2: Objetos Espaciales (Jerarquía JOINED)}
+
+\begin{itemize}
+    \item Objeto\_Espacial (\underline{ID\_Objeto}, NORAD\_ID (UK), Altitud\_Actual\_km, Velocidad\_km\_s, Tipo\_Objeto)
+    \item Satelite (\underline{ID\_Objeto} (FK), ID\_Constelacion (FK), ID\_Orbita (FK), Estado, Masa\_kg, Fecha\_Lanzamiento, Vida\_Util\_Años)
+    \item Basura\_Espacial (\underline{ID\_Objeto} (FK), Descripcion\_Origen, Tamaño\_mts, Nivel\_Riesgo, Fuente\_Radar)
+    \item Orbita (\underline{ID\_Orbita}, Tipo\_Orbita, Apogeo\_km, Perigeo\_km, Inclinacion\_grados, Periodo\_min)
+\end{itemize}
+
+Relaciones absorbidas como FK:
+\begin{itemize}
+    \item Objeto\_Espacial $\rightarrow$ Satelite (1:1 herencia JOINED): ID\_Objeto es PK y FK en Satelite.
+    \item Objeto\_Espacial $\rightarrow$ Basura\_Espacial (1:1 herencia JOINED): ID\_Objeto es PK y FK en Basura\_Espacial.
+    \item Constelacion $\rightarrow$ Satelite Agrupa (1:N): ID\_Constelacion como FK en Satelite.
+    \item Orbita $\rightarrow$ Satelite Define (1:N): ID\_Orbita como FK en Satelite.
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 3: Operaciones Terrestres}
+
+\begin{itemize}
+    \item Estacion\_Terrena (\underline{ID\_Estacion}, ID\_Operador (FK), Nombre\_Instalacion, Pais, Latitud, Longitud, Diametro\_Antena\_m)
+    \item Contacto\_Estacion (\underline{ID\_Contacto}, ID\_Satelite (FK), ID\_Estacion (FK), Timestamp\_Inicio, Timestamp\_Fin, Calidad\_Senal\_dB, Volumen\_Datos\_MB)
+\end{itemize}
+
+Relaciones absorbidas como FK:
+\begin{itemize}
+    \item Operador $\rightarrow$ Estacion\_Terrena Administra (1:N): ID\_Operador como FK en Estacion\_Terrena.
+\end{itemize}
+
+Entidad que resuelve N:M con tabla propia:
+\begin{itemize}
+    \item Contacto\_Estacion: resuelve Satelite $\leftrightarrow$ Estacion\_Terrena (con atributos Calidad\_Senal\_dB y Volumen\_Datos\_MB).
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 4: Monitoreo de Salud}
+
+\begin{itemize}
+    \item Telemetria (\underline{ID\_Telemetria}, ID\_Satelite (FK), Timestamp\_Lectura, Temperatura\_C, Bateria\_Pct, Voltaje\_V, Altitud\_Real\_km, Posicion\_Latitud, Posicion\_Longitud)
+\end{itemize}
+
+Relaciones absorbidas como FK:
+\begin{itemize}
+    \item Satelite $\rightarrow$ Telemetria Emite (1:N): ID\_Satelite como FK en Telemetria.
+\end{itemize}
+
+\vspace{0.5cm}
+\noindent \textbf{Módulo 5: Seguridad Orbital}
+
+\begin{itemize}
+    \item Evento\_Colision (\underline{ID\_Evento}, ID\_Satelite (FK), ID\_Basura (FK), Timestamp\_Estimado, Probabilidad\_Choque, Distancia\_Min\_km, Estado\_Alerta)
+    \item Maniobra\_Evasiva (\underline{ID\_Maniobra}, ID\_Evento (FK, UK), ID\_Operador (FK), Tipo\_Maniobra, Delta\_V\_ms, Timestamp\_Ejecucion, Resultado)
+\end{itemize}
+
+Entidad que resuelve N:M con tabla propia:
+\begin{itemize}
+    \item Evento\_Colision: resuelve Satelite $\leftrightarrow$ Basura\_Espacial (con atributos Probabilidad\_Choque y Distancia\_Min\_km).
+\end{itemize}
+
+Relación 1:1 opcional:
+\begin{itemize}
+    \item Evento\_Colision $\rightarrow$ Maniobra\_Evasiva Genera (1:1 opcional): ID\_Evento como FK con restricción UNIQUE en Maniobra\_Evasiva. Un evento puede generar como máximo una maniobra formal. La FK ID\_Operador vincula la maniobra con el analista que la autorizó (1:N desde Operador).
+\end{itemize}
+
+\section{Especificaciones de transformación}
+
+A continuación se describen las decisiones tomadas para transformar cada elemento del modelo conceptual al modelo relacional en PostgreSQL.
+
+\subsection{Entidades}
+
+Para transformar las entidades fuertes del modelo se han tenido en cuenta las siguientes especificaciones:
+
+\begin{itemize}
+    \item \textbf{Agencia:} Su PK es ID\_Agencia, una clave surrogada autoincremenal de tipo INT. El nombre de la agencia actúa como clave única alternativa (UK). Se incluye el Tipo como discriminador textual (Privada/Gubernamental).
+    \item \textbf{Constelacion:} Su PK es ID\_Constelacion. La FK ID\_Agencia es NOT NULL: toda constelación debe pertenecer a una agencia registrada.
+    \item \textbf{Operador:} Su PK es ID\_Operador. El Correo actúa como clave única alternativa para el inicio de sesión. El atributo Rol está sujeto a CHECK constraint con los cuatro valores operativos permitidos.
+    \item \textbf{Objeto\_Espacial:} Su PK es ID\_Objeto. El NORAD\_ID actúa como clave única alternativa de negocio internacional. El discriminador Tipo\_Objeto (CHECK: Satelite, Basura) determina la subclase activa.
+    \item \textbf{Orbita:} Su PK es ID\_Orbita. El Tipo\_Orbita está sujeto a CHECK constraint (LEO, MEO, GEO, SSO, HEO).
+    \item \textbf{Estacion\_Terrena:} Su PK es ID\_Estacion. La FK ID\_Operador (NOT NULL) conecta la estación con su responsable. Las coordenadas usan DECIMAL(9,6) para precisión geográfica de seis decimales ($\approx 11$ cm de precisión).
+    \item \textbf{Evento\_Colision:} Su PK es ID\_Evento. Las FK ID\_Satelite e ID\_Basura son ambas NOT NULL. El Estado\_Alerta está sujeto a CHECK constraint.
+    \item \textbf{Maniobra\_Evasiva:} Su PK es ID\_Maniobra. La FK ID\_Evento tiene restricción UNIQUE garantizando la relación 1:1 con Evento\_Colision. La FK ID\_Operador es NOT NULL.
+    \item \textbf{Telemetria:} Su PK es ID\_Telemetria de tipo BIGINT (autoincremenal) dado el volumen esperado de registros superior a $2^{31}$ en el largo plazo.
+\end{itemize}
+
+\subsection{Entidades débiles}
+
+En el modelo conceptual no se identificaron entidades débiles en sentido estricto. Las entidades que en un diseño tradicional podrían haberse modelado como débiles —como \texttt{Telemetria} respecto a \texttt{Satelite}, o \texttt{Maniobra\_Evasiva} respecto a \texttt{Evento\_Colision}— fueron convertidas intencionalmente en entidades fuertes con PK surrogada autoincremenal. Esta decisión de diseño, siguiendo la recomendación de Ramakrishnan, elimina la necesidad de llaves compuestas, simplifica los JOINs y mejora el rendimiento transaccional en tablas de alto volumen.
+
+\subsection{Entidades superclase / subclases}
+
+El modelo contempla una jerarquía de herencia implementada mediante el patrón Table Per Subclass (JOINED):
+
+\begin{itemize}
+    \item \textbf{Jerarquía de Objetos Espaciales:} La superclase \texttt{Objeto\_Espacial} se divide en las subclases \texttt{Satelite} y \texttt{Basura\_Espacial}. En ambos casos, la PK de la subclase es \texttt{ID\_Objeto}, que actúa simultáneamente como FK hacia la tabla padre. No se genera una nueva clave en las subclases. La cobertura es total y disjunta: todo objeto registrado en \texttt{Objeto\_Espacial} debe pertenecer a exactamente una subclase, determinada por el campo discriminador \texttt{Tipo\_Objeto}. Esta jerarquía permite que tanto \texttt{Evento\_Colision} como \texttt{Telemetria} referencien objetos sin duplicar los atributos comunes (NORAD\_ID, altitud, velocidad).
+\end{itemize}
+
+\subsection{Relaciones binarias}
+
+Para transformar las relaciones binarias del modelo conceptual al esquema relacional se aplicaron las siguientes reglas:
+
+\textbf{Relaciones 1:1} La llave primaria del lado dependiente recibe la FK de la entidad referenciada, con restricción UNIQUE:
+\begin{itemize}
+    \item Objeto\_Espacial $\rightarrow$ Satelite (herencia): ID\_Objeto es PK y FK en Satelite.
+    \item Objeto\_Espacial $\rightarrow$ Basura\_Espacial (herencia): ID\_Objeto es PK y FK en Basura\_Espacial.
+    \item Evento\_Colision $\rightarrow$ Maniobra\_Evasiva (1:1 opcional): ID\_Evento como FK+UK en Maniobra\_Evasiva.
+\end{itemize}
+
+\textbf{Relaciones 1:N} La llave primaria del lado ``1'' se inyecta como FK en el lado ``N'':
+\begin{itemize}
+    \item Agencia $\rightarrow$ Constelacion: ID\_Agencia como FK en Constelacion.
+    \item Constelacion $\rightarrow$ Satelite: ID\_Constelacion como FK en Satelite.
+    \item Orbita $\rightarrow$ Satelite: ID\_Orbita como FK en Satelite.
+    \item Operador $\rightarrow$ Estacion\_Terrena: ID\_Operador como FK en Estacion\_Terrena.
+    \item Operador $\rightarrow$ Maniobra\_Evasiva: ID\_Operador como FK en Maniobra\_Evasiva.
+    \item Satelite $\rightarrow$ Telemetria: ID\_Satelite como FK en Telemetria.
+\end{itemize}
+
+\textbf{Relaciones N:M resueltas con entidades fuertes:} Dado que todas las asociaciones N:M del modelo presentan atributos propios de la relación, fueron modeladas como entidades fuertes con PK surrogada:
+\begin{itemize}
+    \item Contacto\_Estacion: resuelve Satelite $\leftrightarrow$ Estacion\_Terrena (atributos: Calidad\_Senal\_dB, Volumen\_Datos\_MB).
+    \item Evento\_Colision: resuelve Satelite $\leftrightarrow$ Basura\_Espacial (atributos: Probabilidad\_Choque, Distancia\_Min\_km, Estado\_Alerta).
+\end{itemize}
+
+\subsection{Relaciones ternarias}
+
+En el modelo no se identificaron relaciones ternarias. Todas las asociaciones que involucran tres entidades fueron resueltas incorporando múltiples FKs en la entidad resultante, tratándolas como relaciones binarias independientes convergentes (por ejemplo, \texttt{Contacto\_Estacion} con FKs a \texttt{Satelite} y \texttt{Estacion\_Terrena}).
+
+\section{Diccionario de datos}
+
+A continuación se presenta el diccionario de datos del sistema, con una tabla por cada entidad del modelo relacional. Se detallan el nombre de cada campo, su tipo de dato en PostgreSQL, si actúa como llave primaria (PK) y/o foránea (FK), y una descripción funcional del atributo.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Agencia & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+Nombre & VARCHAR(100) & & & Nombre legal de la corporación (UK) \\
+\hline
+Pais & VARCHAR(50) & & & País sede de operaciones \\
+\hline
+Tipo & VARCHAR(20) & & & Privada o Gubernamental (CHECK) \\
+\hline
+Año\_Fundacion & INT & & & Año de fundación de la organización \\
+\hline
+Sitio\_Web & VARCHAR(100) & & & URL del sitio corporativo (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Agencia}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Constelacion & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+ID\_Agencia & INT & & X & FK Agencia. Propietaria de la misión \\
+\hline
+Nombre\_Mision & VARCHAR(100) & & & Nombre clave de la misión espacial \\
+\hline
+Proposito & VARCHAR(200) & & & Descripción del objetivo (nullable) \\
+\hline
+Fecha\_Inicio & DATE & & & Fecha de inicio de operaciones \\
+\hline
+\end{tabular}
+\caption{Tabla Constelacion}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Operador & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+Nombre & VARCHAR(100) & & & Nombre completo del operador \\
+\hline
+Correo & VARCHAR(100) & & & Correo corporativo (UK). Clave de acceso \\
+\hline
+Rol & VARCHAR(30) & & & Rol: Administrador, Ingeniero\_Vuelo, etc. (CHECK) \\
+\hline
+Fecha\_Contratacion & DATE & & & Fecha de inicio del vínculo laboral \\
+\hline
+\end{tabular}
+\caption{Tabla Operador}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Orbita & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+Tipo\_Orbita & VARCHAR(10) & & & LEO, MEO, GEO, SSO, HEO (CHECK) \\
+\hline
+Apogeo\_km & DECIMAL(10,2) & & & Altitud máxima de la órbita en km \\
+\hline
+Perigeo\_km & DECIMAL(10,2) & & & Altitud mínima de la órbita en km \\
+\hline
+Inclinacion\_grados & DECIMAL(5,2) & & & Inclinación respecto al ecuador en grados \\
+\hline
+Periodo\_min & DECIMAL(8,2) & & & Periodo orbital en minutos \\
+\hline
+\end{tabular}
+\caption{Tabla Orbita}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Objeto & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+NORAD\_ID & VARCHAR(20) & & & ID catálogo internacional (UK) \\
+\hline
+Altitud\_Actual\_km & DECIMAL(10,2) & & & Altitud actual reportada por radar \\
+\hline
+Velocidad\_km\_s & DECIMAL(8,4) & & & Velocidad orbital actual en km/s \\
+\hline
+Tipo\_Objeto & VARCHAR(15) & & & Discriminador: Satelite o Basura (CHECK) \\
+\hline
+\end{tabular}
+\caption{Tabla Objeto\_Espacial (Superclase)}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Objeto & INT & X & X & FK Objeto\_Espacial. Herencia JOINED \\
+\hline
+ID\_Constelacion & INT & & X & FK Constelacion. Misión a la que pertenece \\
+\hline
+ID\_Orbita & INT & & X & FK Orbita. Parámetros de trayectoria objetivo \\
+\hline
+Estado & VARCHAR(20) & & & Activo, Mantenimiento, Destruido (CHECK) \\
+\hline
+Masa\_kg & DECIMAL(8,2) & & & Masa total del satélite en kilogramos \\
+\hline
+Fecha\_Lanzamiento & DATE & & & Fecha de lanzamiento al espacio \\
+\hline
+Vida\_Util\_Años & INT & & & Vida útil de diseño en años (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Satelite (Subclase de Objeto\_Espacial)}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Objeto & INT & X & X & FK Objeto\_Espacial. Herencia JOINED \\
+\hline
+Descripcion\_Origen & VARCHAR(200) & & & Misión o evento que generó el fragmento (nullable) \\
+\hline
+Tamaño\_mts & DECIMAL(8,2) & & & Tamaño estimado en metros (nullable) \\
+\hline
+Nivel\_Riesgo & VARCHAR(20) & & & Bajo, Medio, Alto, Critico (CHECK) \\
+\hline
+Fuente\_Radar & VARCHAR(50) & & & Agencia que reportó el objeto (ESA, NASA) \\
+\hline
+\end{tabular}
+\caption{Tabla Basura\_Espacial (Subclase de Objeto\_Espacial)}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Estacion & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+ID\_Operador & INT & & X & FK Operador. Responsable de la estación \\
+\hline
+Nombre\_Instalacion & VARCHAR(100) & & & Nombre de la instalación \\
+\hline
+Pais & VARCHAR(50) & & & País donde se ubica la estación \\
+\hline
+Latitud & DECIMAL(9,6) & & & Coordenada de latitud (6 decimales) \\
+\hline
+Longitud & DECIMAL(9,6) & & & Coordenada de longitud (6 decimales) \\
+\hline
+Diametro\_Antena\_m & DECIMAL(6,2) & & & Diámetro de la antena principal en metros \\
+\hline
+\end{tabular}
+\caption{Tabla Estacion\_Terrena}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Contacto & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+ID\_Satelite & INT & & X & FK Satelite (subclase de Objeto\_Espacial) \\
+\hline
+ID\_Estacion & INT & & X & FK Estacion\_Terrena \\
+\hline
+Timestamp\_Inicio & TIMESTAMP & & & Fecha y hora de inicio del enlace \\
+\hline
+Timestamp\_Fin & TIMESTAMP & & & Fecha y hora de cierre del enlace (nullable) \\
+\hline
+Calidad\_Senal\_dB & DECIMAL(8,2) & & & Calidad de la señal en decibelios \\
+\hline
+Volumen\_Datos\_MB & DECIMAL(10,2) & & & Datos transferidos en la sesión (nullable) \\
+\hline
+\end{tabular}
+\caption{Tabla Contacto\_Estacion}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Telemetria & BIGINT (SERIAL) & X & & Identificador para alto volumen de registros \\
+\hline
+ID\_Satelite & INT & & X & FK Satelite. Emisor de la telemetría \\
+\hline
+Timestamp\_Lectura & TIMESTAMP & & & Momento exacto de la medición \\
+\hline
+Temperatura\_C & DECIMAL(6,2) & & & Temperatura de los sistemas vitales (°C) \\
+\hline
+Bateria\_Pct & DECIMAL(5,2) & & & Porcentaje de carga de la batería (0--100) \\
+\hline
+Voltaje\_V & DECIMAL(6,3) & & & Voltaje del bus de energía en voltios \\
+\hline
+Altitud\_Real\_km & DECIMAL(10,2) & & & Altitud real medida en km \\
+\hline
+Posicion\_Latitud & DECIMAL(9,6) & & & Latitud de la posición del satélite \\
+\hline
+Posicion\_Longitud & DECIMAL(9,6) & & & Longitud de la posición del satélite \\
+\hline
+\end{tabular}
+\caption{Tabla Telemetria}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Evento & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+ID\_Satelite & INT & & X & FK Satelite en riesgo de colisión \\
+\hline
+ID\_Basura & INT & & X & FK Basura\_Espacial amenazante \\
+\hline
+Timestamp\_Estimado & TIMESTAMP & & & Momento de máxima aproximación \\
+\hline
+Probabilidad\_Choque & DECIMAL(5,4) & & & Probabilidad calculada de impacto (0--1) \\
+\hline
+Distancia\_Min\_km & DECIMAL(10,4) & & & Distancia mínima predicha en km \\
+\hline
+Estado\_Alerta & VARCHAR(25) & & & Emitida, Maniobra\_Autorizada, Esquivada, Falsa\_Alarma (CHECK) \\
+\hline
+\end{tabular}
+\caption{Tabla Evento\_Colision}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|l|l|c|c|p{5cm}|}
+\hline
+\textbf{Nombre Campo} & \textbf{Tipo de Dato} & \textbf{PK} & \textbf{FK} & \textbf{Descripción} \\
+\hline
+ID\_Maniobra & INT (SERIAL) & X & & Identificador surrogado autoincremental \\
+\hline
+ID\_Evento & INT & & X & FK Evento\_Colision (UK: relación 1:1) \\
+\hline
+ID\_Operador & INT & & X & FK Operador que autorizó la maniobra \\
+\hline
+Tipo\_Maniobra & VARCHAR(30) & & & Alzamiento\_Orbital, Descenso\_Orbital, Ajuste\_Lateral (CHECK) \\
+\hline
+Delta\_V\_ms & DECIMAL(8,4) & & & Variación de velocidad aplicada en m/s \\
+\hline
+Timestamp\_Ejecucion & TIMESTAMP & & & Momento de ejecución de la maniobra \\
+\hline
+Resultado & VARCHAR(20) & & & Exitosa, Fallida, Cancelada (CHECK) \\
+\hline
+\end{tabular}
+\caption{Tabla Maniobra\_Evasiva}
+\end{table}
